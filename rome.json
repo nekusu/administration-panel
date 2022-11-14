@@ -1,0 +1,30 @@
+{
+  "formatter": {
+    "ignore": [
+      "node_modules"
+    ],
+    "lineWidth": 100,
+    "indentSize": 2,
+    "indentStyle": "space"
+  },
+  "linter": {
+    "ignore": [
+      "node_modules"
+    ],
+    "rules": {
+      "style": {
+        "noImplicitBoolean": "off"
+      },
+      "nursery": {
+        "noBannedTypes": "error",
+        "noConstAssign": "error",
+        "noExplicitAny": "error"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single"
+    }
+  }
+}
