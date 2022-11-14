@@ -1,4 +1,5 @@
 import { MantineProviders, Sidebar } from 'components';
+import Orders from 'features/orders';
 import { Group } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 
@@ -9,6 +10,7 @@ export default function App() {
     <MantineProviders>
       <Group spacing={0} noWrap>
         <Sidebar pageIndex={pageIndex} setPageIndex={setPageIndex} />
+        <Orders />
       </Group>
     </MantineProviders>
   );
