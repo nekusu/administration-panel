@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { MainLayout, Table } from 'components';
 import { orderBy, OrderByDirection, query, where } from 'firebase/firestore';
 import { clientsCollection, ordersCollection } from 'lib/firebase/collections';
-import { useCollectionData } from 'react-firebase-hooks/firestore';
+import {
+  useCollectionDataPersistent,
+} from 'lib/react-firebase-hooks/useCollectionDataPersistent';
 import { RiAddLine, RiUserSettingsLine } from 'react-icons/ri';
 import { Filters } from 'types/filters';
 import { Order } from 'types/order';
@@ -14,7 +16,7 @@ export default function Orders() {
   const [visibleNumbers] = useLocalStorage({ key: 'visible-numbers', defaultValue: true });
 
   const clientsQuery = query(clientsCollection, orderBy('name', 'asc'));
-  const [clients, clientsLoading] = useCollectionData(clientsQuery, { initialValue: [] });
+  const [clients] = useCollectionDataPersistent(clientsQuery);
 
   const [statusFilter] = useLocalStorage<Filters.Status>({
     key: 'status-filter',
@@ -41,7 +43,7 @@ export default function Orders() {
     ordersQueryConstraints.push(where('clientId', 'in', clientsFilter));
   }
   const ordersQuery = query(ordersCollection, ...ordersQueryConstraints);
-  const [orders, ordersLoading] = useCollectionData(ordersQuery, { initialValue: [] });
+  const [orders] = useCollectionDataPersistent(ordersQuery);
 
   const [orderFormOpened, orderFormHandler] = useDisclosure(false);
   const [clientListOpened, clientListHandler] = useDisclosure(false);
@@ -82,11 +84,7 @@ export default function Orders() {
           clients={clients}
         />
         <ClientList opened={clientListOpened} close={clientListHandler.close} clients={clients} />
-        {clientsLoading || ordersLoading ? (
-          <Center sx={{ flex: 1 }}>
-            <Loader />
-          </Center>
-        ) : (
+        {clients && orders ? (
           <Table>
             <Table.Header>
               <th style={{ width: 0 }}>Status</th>
@@ -97,11 +95,11 @@ export default function Orders() {
               <th style={{ width: 0 }} />
             </Table.Header>
             <Table.Body>
-              {orders?.map((order) => (
+              {orders.map((order) => (
                 <OrderItem
                   key={order.id}
                   order={order}
-                  clientName={clients?.find((client) => client.id === order.clientId)?.name}
+                  clientName={clients.find((client) => client.id === order.clientId)?.name}
                   visibleNumbers={visibleNumbers}
                   setFormValues={setFormValues}
                   openOrderForm={orderFormHandler.open}
@@ -109,6 +107,10 @@ export default function Orders() {
               ))}
             </Table.Body>
           </Table>
+        ) : (
+          <Center sx={{ flex: 1 }}>
+            <Loader />
+          </Center>
         )}
       </MainLayout.Body>
     </MainLayout>
