@@ -4,6 +4,8 @@ import {
   RiEyeOffLine,
   RiFilterLine,
   RiFilterOffLine,
+  RiLayoutRight2Line,
+  RiLayoutRightLine,
 } from 'react-icons/ri';
 import {
   Box,
@@ -33,7 +35,7 @@ interface BodyProps {
   sx?: Sx;
 }
 
-const useStyles = createStyles(() => ({
+const useStyles = createStyles((theme) => ({
   modalContainer: {
     height: '100vh',
     width: '100%',
@@ -42,11 +44,17 @@ const useStyles = createStyles(() => ({
     left: 0,
     pointerEvents: 'none',
   },
+  filtersGrid: {
+    maxWidth: 1400,
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
+    gap: theme.spacing.sm,
+  },
 }));
 
 export default function MainLayout({ children }: { children: ReactNode }) {
   return (
-    <Stack spacing={0} sx={{ height: '100vh', flex: 1 }}>
+    <Stack spacing={0} sx={{ height: '100vh', minWidth: 0, flex: 1 }}>
       {children}
     </Stack>
   );
@@ -62,19 +70,21 @@ function Header({ children, title, buttons, filters, withNumbersToggle, sx }: He
     key: 'visible-numbers',
     defaultValue: true,
   });
+  const [visibleSidePanel, setVisibleSidePanel] = useLocalStorage({
+    key: 'visible-side-panel',
+    defaultValue: true,
+  });
 
   const toggleVisibleFilters = () => setVisibleFilters((prevState) => !prevState);
   const toggleVisibleNumbers = () => setVisibleNumbers((prevState) => !prevState);
+  const toggleVisibleSidePanel = () => setVisibleSidePanel((prevState) => !prevState);
 
   return (
     <MantineHeader height="fit-content" p="lg" zIndex={2} sx={{ position: 'relative', ...sx }}>
       <Box className={cx(classes.modalContainer, 'modal-container')} />
-      <Title order={1} mb="md">
-        {title}
-      </Title>
-      <Group spacing="sm">
-        {buttons}
-        <Group spacing={8} ml="auto">
+      <Group align="flex-start" mb="md">
+        <Title order={1}>{title}</Title>
+        <Group spacing={8} ml="auto" mt={6}>
           {filters && (
             <Tooltip label={visibleFilters ? 'Hide filters' : 'Show filters'} withinPortal>
               <Button
@@ -97,11 +107,23 @@ function Header({ children, title, buttons, filters, withNumbersToggle, sx }: He
               </Button>
             </Tooltip>
           )}
+          <Tooltip label={visibleSidePanel ? 'Hide side panel' : 'Show side panel'} withinPortal>
+            <Button
+              variant={visibleSidePanel ? 'light' : 'subtle'}
+              px="xs"
+              onClick={toggleVisibleSidePanel}
+            >
+              {visibleSidePanel ? <RiLayoutRightLine /> : <RiLayoutRight2Line />}
+            </Button>
+          </Tooltip>
         </Group>
       </Group>
+      <Group spacing="sm">{buttons}</Group>
       {filters && (
         <Collapse in={visibleFilters}>
-          <Box pt="md">{filters}</Box>
+          <Box pt="sm" className={classes.filtersGrid}>
+            {filters}
+          </Box>
         </Collapse>
       )}
       {children}

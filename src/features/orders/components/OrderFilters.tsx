@@ -36,7 +36,7 @@ export default function OrdersFilters({ clients }: OrdersFiltersProps) {
   });
 
   return (
-    <Group align="flex-end" spacing="sm">
+    <>
       <LabeledSegmentedControl
         label="Status"
         data={[
@@ -53,7 +53,7 @@ export default function OrdersFilters({ clients }: OrdersFiltersProps) {
         data={[
           {
             label: (
-              <Group spacing="xs" noWrap>
+              <Group spacing="xs" position="center" noWrap>
                 <RiMoneyDollarCircleLine />
                 <Text>Price</Text>
               </Group>
@@ -62,7 +62,7 @@ export default function OrdersFilters({ clients }: OrdersFiltersProps) {
           },
           {
             label: (
-              <Group spacing="xs" noWrap>
+              <Group spacing="xs" position="center" noWrap>
                 <RiCalendarTodoLine />
                 <Text>Received</Text>
               </Group>
@@ -71,7 +71,7 @@ export default function OrdersFilters({ clients }: OrdersFiltersProps) {
           },
           {
             label: (
-              <Group spacing="xs" noWrap>
+              <Group spacing="xs" position="center" noWrap>
                 <RiCalendarCheckLine />
                 <Text>Delivered</Text>
               </Group>
@@ -87,7 +87,7 @@ export default function OrdersFilters({ clients }: OrdersFiltersProps) {
         data={[
           {
             label: (
-              <Group spacing="xs" noWrap>
+              <Group spacing="xs" position="center" noWrap>
                 <RiArrowUpLine />
                 <Text>Ascending</Text>
               </Group>
@@ -96,7 +96,7 @@ export default function OrdersFilters({ clients }: OrdersFiltersProps) {
           },
           {
             label: (
-              <Group spacing="xs" noWrap>
+              <Group spacing="xs" position="center" noWrap>
                 <RiArrowDownLine />
                 <Text>Descending</Text>
               </Group>
@@ -118,6 +118,6 @@ export default function OrdersFilters({ clients }: OrdersFiltersProps) {
         value={clientsFilter}
         onChange={setClientsFilter}
       />
-    </Group>
+    </>
   );
 }
