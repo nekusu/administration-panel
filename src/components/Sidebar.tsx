@@ -5,12 +5,14 @@ import {
   RiGithubLine,
   RiPaletteLine,
 } from 'react-icons/ri';
-import { Navbar, Popover, Stack } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { Drawer, Navbar, Popover, Stack } from '@mantine/core';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 
 interface SidebarProps {
   pageIndex: number;
   setPageIndex(value: number): void;
+  opened: boolean;
+  onClose(): void;
 }
 
 const links = [
@@ -18,13 +20,20 @@ const links = [
   { icon: RiArchiveLine, label: 'Stock' },
 ];
 
-export default function Sidebar({ pageIndex, setPageIndex }: SidebarProps) {
+export default function Sidebar({ pageIndex, setPageIndex, opened, onClose }: SidebarProps) {
+  const isMobile = useMediaQuery('(max-width: 600px)');
   const [themePopoverOpened, themePopoverHandler] = useDisclosure(false);
 
-  return (
-    <Navbar py="lg" px="md" sx={{ width: 'min-content', minHeight: '100vh' }} zIndex="3">
+  let content = (
+    <Navbar
+      withBorder={!isMobile}
+      py="lg"
+      px={isMobile ? 'lg' : 'md'}
+      sx={{ width: 'min-content', minHeight: '100vh' }}
+      zIndex="3"
+    >
       <Navbar.Section grow>
-        <Stack spacing={4}>
+        <Stack spacing={isMobile ? 6 : 4}>
           {links.map((link, index) => (
             <SidebarButton
               {...link}
@@ -38,7 +47,7 @@ export default function Sidebar({ pageIndex, setPageIndex }: SidebarProps) {
       <Navbar.Section>
         <Stack spacing={4}>
           <ThemePopover
-            position="right"
+            position={isMobile ? 'top-start' : 'right'}
             opened={themePopoverOpened}
             onChange={themePopoverHandler.toggle}
           >
@@ -60,4 +69,14 @@ export default function Sidebar({ pageIndex, setPageIndex }: SidebarProps) {
       </Navbar.Section>
     </Navbar>
   );
+
+  if (isMobile) {
+    content = (
+      <Drawer size="auto" withCloseButton={false} opened={opened} onClose={onClose}>
+        {content}
+      </Drawer>
+    );
+  }
+
+  return content;
 }

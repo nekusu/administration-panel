@@ -1,3 +1,4 @@
+export { default as FloatingButton } from './FloatingButton';
 export { default as LabeledSegmentedControl } from './LabeledSegmentedControl';
 export { default as MainLayout } from './MainLayout';
 export { default as MantineProviders } from './MantineProviders';

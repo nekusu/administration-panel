@@ -72,6 +72,7 @@ export default function OrderItem({
       centered: true,
       target: '.modal-container',
     });
+  const tooltipEvents = { hover: true, focus: true, touch: true };
 
   return (
     <tr style={{ cursor: 'default' }}>
@@ -171,6 +172,7 @@ export default function OrderItem({
       <td>
         <Tooltip
           label={dayjs(order.receivedTimestamp).calendar(dayjs(), { sameElse: 'llll' })}
+          events={tooltipEvents}
           openDelay={500}
         >
           <Text sx={{ cursor: 'help' }}>{dayjs(order.receivedTimestamp).format('L')}</Text>
@@ -179,6 +181,7 @@ export default function OrderItem({
       <td>
         <Tooltip
           label={dayjs(order.deliveredTimestamp).calendar(dayjs(), { sameElse: 'llll' })}
+          events={tooltipEvents}
           openDelay={500}
           disabled={!order.deliveredTimestamp}
         >

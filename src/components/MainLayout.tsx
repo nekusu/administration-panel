@@ -19,7 +19,7 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core';
-import { useLocalStorage } from '@mantine/hooks';
+import { useLocalStorage, useMediaQuery } from '@mantine/hooks';
 
 interface HeaderProps {
   children?: ReactNode;
@@ -62,6 +62,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
 
 function Header({ children, title, buttons, filters, withNumbersToggle, sx }: HeaderProps) {
   const { classes, cx } = useStyles();
+  const isMobile = useMediaQuery('(max-width: 600px)');
   const [visibleFilters, setVisibleFilters] = useLocalStorage({
     key: 'visible-filters',
     defaultValue: true,
@@ -107,15 +108,17 @@ function Header({ children, title, buttons, filters, withNumbersToggle, sx }: He
               </Button>
             </Tooltip>
           )}
-          <Tooltip label={visibleSidePanel ? 'Hide side panel' : 'Show side panel'} withinPortal>
-            <Button
-              variant={visibleSidePanel ? 'light' : 'subtle'}
-              px="xs"
-              onClick={toggleVisibleSidePanel}
-            >
-              {visibleSidePanel ? <RiLayoutRightLine /> : <RiLayoutRight2Line />}
-            </Button>
-          </Tooltip>
+          {!isMobile && (
+            <Tooltip label={visibleSidePanel ? 'Hide side panel' : 'Show side panel'} withinPortal>
+              <Button
+                variant={visibleSidePanel ? 'light' : 'subtle'}
+                px="xs"
+                onClick={toggleVisibleSidePanel}
+              >
+                {visibleSidePanel ? <RiLayoutRightLine /> : <RiLayoutRight2Line />}
+              </Button>
+            </Tooltip>
+          )}
         </Group>
       </Group>
       <Group spacing="sm">{buttons}</Group>
