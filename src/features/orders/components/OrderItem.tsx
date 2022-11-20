@@ -1,13 +1,17 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Table } from 'components';
 import dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { deleteOrder, editOrder } from 'lib/firebase/utils';
+import useBreakpoints from 'lib/mantine/useBreakpoints';
+import { Dispatch, SetStateAction } from 'react';
 import {
   RiCheckLine,
   RiDeleteBin7Line,
+  RiLoaderLine,
   RiMoneyDollarCircleLine,
   RiPencilLine,
+  RiUserFollowLine,
 } from 'react-icons/ri';
 import { Order } from 'types/order';
 import {
@@ -36,7 +40,12 @@ interface OrderItemProps {
 
 dayjs.extend(calendar);
 dayjs.extend(localizedFormat);
-const STATUS_COLORS = { pending: 'yellow', finished: 'green', delivered: 'cyan' };
+const STATUS_ITEMS = {
+  pending: { color: 'yellow', icon: <RiLoaderLine /> },
+  finished: { color: 'green', icon: <RiCheckLine /> },
+  delivered: { color: 'cyan', icon: <RiUserFollowLine /> },
+};
+const MAX_PRICE = 999999999;
 
 export default function OrderItem({
   order,
@@ -46,22 +55,36 @@ export default function OrderItem({
   openOrderForm,
 }: OrderItemProps) {
   const theme = useMantineTheme();
+  const isSmallScreen = useBreakpoints({ smallerThan: 'sm' });
   const form = useForm({
-    initialValues: { price: null },
+    initialValues: { price: null } as { price: number | null },
     validate: {
-      price: (value) => (value ? null : 'Invalid price'),
+      price: (value: number) => {
+        if (value == null) {
+          return 'Invalid price';
+        }
+        if (value < 1) {
+          return 'Price cannot be less than 1';
+        }
+        if (value > MAX_PRICE) {
+          return `Price cannot be greater than ${MAX_PRICE}`;
+        }
+      },
     },
   });
   const [pricePopoverOpened, pricePopoverHandler] = useDisclosure(false);
 
+  const commonModalProps = {
+    centered: true,
+    target: '.modal-container',
+  };
   const openPendingModal = () =>
     openConfirmModal({
       title: <Title order={5}>Are you sure you want to mark this order as pending again?</Title>,
       children: <Text size="sm">The delivery date will be lost.</Text>,
       labels: { confirm: 'Confirm', cancel: 'Cancel' },
       onConfirm: () => editOrder(order.id, { status: 'pending', deliveredTimestamp: null }),
-      centered: true,
-      target: '.modal-container',
+      ...commonModalProps,
     });
   const openDeleteModal = () =>
     openConfirmModal({
@@ -69,13 +92,12 @@ export default function OrderItem({
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       onConfirm: () => deleteOrder(order.id),
       confirmProps: { color: 'red' },
-      centered: true,
-      target: '.modal-container',
+      ...commonModalProps,
     });
   const tooltipEvents = { hover: true, focus: true, touch: true };
 
   return (
-    <tr style={{ cursor: 'default' }}>
+    <Table.Row layoutId={order.id}>
       <td>
         <Popover
           position="right"
@@ -98,7 +120,7 @@ export default function OrderItem({
               <Button
                 size="xs"
                 variant="light"
-                color={STATUS_COLORS[order.status]}
+                color={STATUS_ITEMS[order.status].color}
                 fullWidth
                 onClick={() => {
                   switch (order.status) {
@@ -125,26 +147,29 @@ export default function OrderItem({
                   }
                 }}
               >
-                <Text transform="capitalize">{order.status}</Text>
+                {isSmallScreen ? (
+                  STATUS_ITEMS[order.status].icon
+                ) : (
+                  <Text transform="capitalize">{order.status}</Text>
+                )}
               </Button>
             </Tooltip>
           </Popover.Target>
           <Popover.Dropdown>
             <form
               onSubmit={form.onSubmit(({ price }) => {
-                if (!price) {
-                  return;
+                if (price) {
+                  pricePopoverHandler.close();
+                  editOrder(order.id, { status: 'finished', price });
                 }
-                pricePopoverHandler.close();
-                editOrder(order.id, { status: 'finished', price });
               })}
             >
               <Group spacing="sm" align="flex-start">
                 <NumberInput
                   icon={<RiMoneyDollarCircleLine />}
                   placeholder="Enter price"
-                  min={0}
-                  max={999999999}
+                  min={1}
+                  max={MAX_PRICE}
                   {...form.getInputProps('price')}
                 />
                 <ActionIcon variant="filled" color={theme.primaryColor} my={1} type="submit">
@@ -210,6 +235,6 @@ export default function OrderItem({
           </Tooltip>
         </Group>
       </td>
-    </tr>
+    </Table.Row>
   );
 }

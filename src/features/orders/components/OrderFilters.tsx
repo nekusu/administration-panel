@@ -1,40 +1,23 @@
 import { LabeledSegmentedControl } from 'components';
-import { OrderByDirection } from 'firebase/firestore';
 import {
   RiArrowDownLine,
   RiArrowUpLine,
   RiCalendarCheckLine,
   RiCalendarTodoLine,
   RiMoneyDollarCircleLine,
-  RiUserLine,
+  RiUserSearchLine,
 } from 'react-icons/ri';
 import { Client } from 'types/client';
 import { Filters } from 'types/filters';
 import { Group, MultiSelect, Text } from '@mantine/core';
-import { useLocalStorage } from '@mantine/hooks';
 
-interface OrdersFiltersProps {
+interface OrderFiltersProps {
   clients?: Client[];
+  filters: Filters.Order;
+  updateFilter(value: Partial<Filters.Order>): void;
 }
 
-export default function OrdersFilters({ clients }: OrdersFiltersProps) {
-  const [statusFilter, setStatusFilter] = useLocalStorage<Filters.Status>({
-    key: 'status-filter',
-    defaultValue: 'all',
-  });
-  const [orderByFilter, setOrderByFilter] = useLocalStorage<Filters.OrderBy>({
-    key: 'order-by-filter',
-    defaultValue: 'receivedTimestamp',
-  });
-  const [directionFilter, setDirectionFilter] = useLocalStorage<OrderByDirection>({
-    key: 'direction-filter',
-    defaultValue: 'desc',
-  });
-  const [clientsFilter, setClientsFilter] = useLocalStorage<string[]>({
-    key: 'clients-filter',
-    defaultValue: [],
-  });
-
+export default function OrderFilters({ clients, filters, updateFilter }: OrderFiltersProps) {
   return (
     <>
       <LabeledSegmentedControl
@@ -45,8 +28,8 @@ export default function OrdersFilters({ clients }: OrdersFiltersProps) {
           { label: 'Finished', value: 'finished' },
           { label: 'Delivered', value: 'delivered' },
         ]}
-        value={statusFilter}
-        onChange={(value: Filters.Status) => setStatusFilter(value)}
+        value={filters.status}
+        onChange={(value: Filters.Order['status']) => updateFilter({ status: value })}
       />
       <LabeledSegmentedControl
         label="Order by"
@@ -79,8 +62,8 @@ export default function OrdersFilters({ clients }: OrdersFiltersProps) {
             value: 'deliveredTimestamp',
           },
         ]}
-        value={orderByFilter}
-        onChange={(value: Filters.OrderBy) => setOrderByFilter(value)}
+        value={filters.orderBy}
+        onChange={(value: Filters.Order['orderBy']) => updateFilter({ orderBy: value })}
       />
       <LabeledSegmentedControl
         label="Direction"
@@ -104,19 +87,19 @@ export default function OrdersFilters({ clients }: OrdersFiltersProps) {
             value: 'desc',
           },
         ]}
-        value={directionFilter}
-        onChange={(value: OrderByDirection) => setDirectionFilter(value)}
+        value={filters.direction}
+        onChange={(value: Filters.Order['direction']) => updateFilter({ direction: value })}
       />
       <MultiSelect
         label="Filter by clients"
-        data={clients?.map((client) => ({ value: client.id, label: client.name })) || []}
-        icon={<RiUserLine />}
+        data={clients?.map((client) => ({ value: client.id, label: client.name })) ?? []}
+        icon={<RiUserSearchLine />}
         placeholder="Select clients"
         nothingFound="Client not found"
         maxLength={36}
         searchable
-        value={clientsFilter}
-        onChange={setClientsFilter}
+        value={filters.clients}
+        onChange={(value) => updateFilter({ clients: value })}
       />
     </>
   );

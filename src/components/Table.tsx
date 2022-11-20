@@ -1,5 +1,5 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import { ReactNode } from 'react';
-import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { createStyles, Table as MantineTable } from '@mantine/core';
 
 const useStyles = createStyles((theme) => ({
@@ -31,10 +31,28 @@ function Header({ children }: { children: ReactNode }) {
 }
 
 function Body({ children }: { children: ReactNode }) {
-  const [tableBody] = useAutoAnimate<HTMLTableSectionElement>();
+  return (
+    <tbody>
+      <AnimatePresence>{children}</AnimatePresence>
+    </tbody>
+  );
+}
 
-  return <tbody ref={tableBody}>{children}</tbody>;
+function Row({ children, layoutId, ...props }: { children: ReactNode; layoutId: string }) {
+  return (
+    <motion.tr
+      style={{ cursor: 'default' }}
+      layoutId={layoutId}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      {...props}
+    >
+      {children}
+    </motion.tr>
+  );
 }
 
 Table.Header = Header;
 Table.Body = Body;
+Table.Row = Row;

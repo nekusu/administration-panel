@@ -1,29 +1,21 @@
-import { Button, ButtonProps } from '@mantine/core';
-
-interface FloatingButtonProps extends ButtonProps {
-  position: {
-    top?: number;
-    right?: number;
-    bottom?: number;
-    left?: number;
-  };
-}
+import { ComponentPropsWithoutRef } from 'react';
+import { Button, ButtonProps, Paper } from '@mantine/core';
 
 export default function FloatingButton({
   children,
-  position,
+  top,
+  left,
+  bottom,
+  right,
   ...props
-}: FloatingButtonProps & React.ComponentPropsWithoutRef<'button'>) {
+}: ButtonProps & ComponentPropsWithoutRef<'button'>) {
+  const position = { top, left, bottom, right };
+
   return (
-    <Button
-      variant="light"
-      size="md"
-      m="lg"
-      p="sm"
-      sx={(theme) => ({ position: 'absolute', boxShadow: theme.shadows.md, ...position })}
-      {...props}
-    >
-      {children}
-    </Button>
+    <Paper m="lg" shadow="md" sx={{ position: 'absolute', zIndex: 3 }} {...position}>
+      <Button variant="light" size="md" p="sm" {...props}>
+        {children}
+      </Button>
+    </Paper>
   );
 }

@@ -1,12 +1,9 @@
 import { SidebarButton, ThemePopover } from 'components';
-import {
-  RiArchiveLine,
-  RiBook2Line,
-  RiGithubLine,
-  RiPaletteLine,
-} from 'react-icons/ri';
+import useBreakpoints from 'lib/mantine/useBreakpoints';
+import useWindowSize from 'lib/mantine/useWindowSize';
+import { RiArchiveLine, RiBook2Line, RiGithubLine, RiPaletteLine } from 'react-icons/ri';
 import { Drawer, Navbar, Popover, Stack } from '@mantine/core';
-import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import { useDisclosure } from '@mantine/hooks';
 
 interface SidebarProps {
   pageIndex: number;
@@ -21,23 +18,25 @@ const links = [
 ];
 
 export default function Sidebar({ pageIndex, setPageIndex, opened, onClose }: SidebarProps) {
-  const isMobile = useMediaQuery('(max-width: 600px)');
+  const isSmallScreen = useBreakpoints({ smallerThan: 'sm' });
+  const { height } = useWindowSize();
   const [themePopoverOpened, themePopoverHandler] = useDisclosure(false);
 
   let content = (
     <Navbar
-      withBorder={!isMobile}
+      withBorder={!isSmallScreen}
       py="lg"
-      px={isMobile ? 'lg' : 'md'}
-      sx={{ width: 'min-content', minHeight: '100vh' }}
-      zIndex="3"
+      px={isSmallScreen ? 'lg' : 'md'}
+      sx={{ width: 'min-content', height }}
+      zIndex={4}
     >
       <Navbar.Section grow>
-        <Stack spacing={isMobile ? 6 : 4}>
+        <Stack spacing={isSmallScreen ? 6 : 4}>
           {links.map((link, index) => (
             <SidebarButton
               {...link}
               key={link.label}
+              small={isSmallScreen}
               active={index === pageIndex}
               onClick={() => setPageIndex(index)}
             />
@@ -47,7 +46,7 @@ export default function Sidebar({ pageIndex, setPageIndex, opened, onClose }: Si
       <Navbar.Section>
         <Stack spacing={4}>
           <ThemePopover
-            position={isMobile ? 'top-start' : 'right'}
+            position={isSmallScreen ? 'top-start' : 'right'}
             opened={themePopoverOpened}
             onChange={themePopoverHandler.toggle}
           >
@@ -55,6 +54,7 @@ export default function Sidebar({ pageIndex, setPageIndex, opened, onClose }: Si
               <SidebarButton
                 icon={RiPaletteLine}
                 label="Theme"
+                small={isSmallScreen}
                 active={themePopoverOpened}
                 onClick={themePopoverHandler.toggle}
               />
@@ -63,6 +63,7 @@ export default function Sidebar({ pageIndex, setPageIndex, opened, onClose }: Si
           <SidebarButton
             icon={RiGithubLine}
             label="Check out my GitHub!"
+            small={isSmallScreen}
             onClick={() => window.open('https://github.com/nekusu', '_blank')}
           />
         </Stack>
@@ -70,7 +71,7 @@ export default function Sidebar({ pageIndex, setPageIndex, opened, onClose }: Si
     </Navbar>
   );
 
-  if (isMobile) {
+  if (isSmallScreen) {
     content = (
       <Drawer size="auto" withCloseButton={false} opened={opened} onClose={onClose}>
         {content}

@@ -1,20 +1,13 @@
-import { Dispatch, SetStateAction } from 'react';
 import { LabeledSegmentedControl } from 'components';
+import { Dispatch, SetStateAction } from 'react';
 import { RiCalendar2Line, RiCalendarEventLine } from 'react-icons/ri';
 import { Filters } from 'types/filters';
-import {
-  Box,
-  Checkbox,
-  Collapse,
-  createStyles,
-  Group,
-  MultiSelect,
-  Stack,
-} from '@mantine/core';
-import { DateRangePicker, DateRangePickerValue } from '@mantine/dates';
-import { useLocalStorage } from '@mantine/hooks';
+import { Box, Checkbox, Collapse, createStyles, Group, MultiSelect, Stack } from '@mantine/core';
+import { DateRangePicker, DateRangePickerValue, getWeekdaysNames } from '@mantine/dates';
 
 interface EarningsFiltersProps {
+  filters: Filters.Earnings;
+  updateFilter(value: Partial<Filters.Earnings>): void;
   dateRange: DateRangePickerValue;
   setDateRange: Dispatch<SetStateAction<DateRangePickerValue>>;
 }
@@ -27,80 +20,59 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-function EarningsFilters({ dateRange, setDateRange }: EarningsFiltersProps) {
+const TIMEFRAME_UNITS = ['Week', 'Month', 'Year', 'Custom'];
+
+export default function EarningsFilters({
+  filters,
+  updateFilter,
+  dateRange,
+  setDateRange,
+}: EarningsFiltersProps) {
   const { classes } = useStyles();
-  const [timeframe, setTimeframe] = useLocalStorage<Filters.Timeframe>({
-    key: 'timeframe-filter',
-    defaultValue: 'year',
-  });
-  const [excludedDays, setExcludedDays] = useLocalStorage<string[]>({
-    key: 'excluded-days-filter',
-    defaultValue: [],
-  });
-  const [showLeftTicks, setShowLeftTicks] = useLocalStorage({
-    key: 'show-left-ticks',
-    defaultValue: true,
-  });
-  const [showBottomTicks, setShowBottomTicks] = useLocalStorage({
-    key: 'show-bottom-ticks',
-    defaultValue: false,
-  });
 
   return (
     <Box className={classes.grid}>
       <Stack spacing={0}>
         <LabeledSegmentedControl
           label="Timeframe"
-          data={[
-            { label: 'Week', value: 'week' },
-            { label: 'Month', value: 'month' },
-            { label: 'Year', value: 'year' },
-            { label: 'Custom', value: 'custom' },
-          ]}
-          value={timeframe}
-          onChange={(value: Filters.Timeframe) => setTimeframe(value)}
+          data={TIMEFRAME_UNITS.map((unit) => ({ label: unit, value: unit.toLowerCase() }))}
+          value={filters.timeframe}
+          onChange={(value: Filters.Earnings['timeframe']) => updateFilter({ timeframe: value })}
         />
-        <Collapse in={timeframe === 'custom'}>
+        <Collapse in={filters.timeframe === 'custom'}>
           <DateRangePicker
             icon={<RiCalendar2Line />}
             placeholder="Select dates range"
             firstDayOfWeek="sunday"
+            pt="md"
             value={dateRange}
             onChange={setDateRange}
-            pt="md"
           />
         </Collapse>
       </Stack>
       <MultiSelect
         label="Exclude"
-        data={[
-          { label: 'Sunday', value: '0' },
-          { label: 'Monday', value: '1' },
-          { label: 'Tuesday', value: '2' },
-          { label: 'Wednesday', value: '3' },
-          { label: 'Thursday', value: '4' },
-          { label: 'Friday', value: '5' },
-          { label: 'Saturday', value: '6' },
-        ]}
+        data={getWeekdaysNames('en', 'sunday', 'dddd').map((day, index) => ({
+          label: day,
+          value: index.toString(),
+        }))}
         icon={<RiCalendarEventLine />}
         placeholder="Select days"
-        value={excludedDays}
-        onChange={setExcludedDays}
+        value={filters.excludedDays}
+        onChange={(value) => updateFilter({ excludedDays: value })}
       />
       <Group pt={6}>
         <Checkbox
-          checked={showLeftTicks}
-          label="Show left ticks"
-          onChange={(event) => setShowLeftTicks(event.target.checked)}
+          checked={filters.enableLeftTicks}
+          label="Enable left ticks"
+          onChange={({ target: { checked } }) => updateFilter({ enableLeftTicks: checked })}
         />
         <Checkbox
-          checked={showBottomTicks}
-          label="Show bottom ticks"
-          onChange={(event) => setShowBottomTicks(event.target.checked)}
+          checked={filters.enableBottomTicks}
+          label="Enable bottom ticks"
+          onChange={({ target: { checked } }) => updateFilter({ enableBottomTicks: checked })}
         />
       </Group>
     </Box>
   );
 }
-
-export default EarningsFilters;

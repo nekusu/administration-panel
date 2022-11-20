@@ -1,5 +1,10 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import useScroll from 'hooks/useScroll';
+import useBreakpoints from 'lib/mantine/useBreakpoints';
+import useWindowSize from 'lib/mantine/useWindowSize';
 import { ReactNode } from 'react';
 import {
+  RiArrowUpLine,
   RiEyeLine,
   RiEyeOffLine,
   RiFilterLine,
@@ -8,22 +13,28 @@ import {
   RiLayoutRightLine,
 } from 'react-icons/ri';
 import {
+  Affix,
   Box,
   Button,
   Collapse,
   createStyles,
   Group,
   Header as MantineHeader,
+  HeaderProps as MantineHeaderProps,
+  Loader,
   Stack,
   Sx,
   Title,
   Tooltip,
+  Transition,
+  useMantineTheme,
 } from '@mantine/core';
-import { useLocalStorage, useMediaQuery } from '@mantine/hooks';
+import { useDebouncedValue, useLocalStorage } from '@mantine/hooks';
 
-interface HeaderProps {
+interface HeaderProps extends Omit<MantineHeaderProps, 'children' | 'height'> {
   children?: ReactNode;
   title: string;
+  loading?: boolean;
   buttons: ReactNode;
   filters?: ReactNode;
   withNumbersToggle?: boolean;
@@ -36,14 +47,6 @@ interface BodyProps {
 }
 
 const useStyles = createStyles((theme) => ({
-  modalContainer: {
-    height: '100vh',
-    width: '100%',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    pointerEvents: 'none',
-  },
   filtersGrid: {
     maxWidth: 1400,
     display: 'grid',
@@ -53,50 +56,59 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function MainLayout({ children }: { children: ReactNode }) {
+  const { height } = useWindowSize();
+
   return (
-    <Stack spacing={0} sx={{ height: '100vh', minWidth: 0, flex: 1 }}>
+    <Stack h={height} spacing={0}>
       {children}
     </Stack>
   );
 }
 
-function Header({ children, title, buttons, filters, withNumbersToggle, sx }: HeaderProps) {
-  const { classes, cx } = useStyles();
-  const isMobile = useMediaQuery('(max-width: 600px)');
+function Header({
+  children,
+  title,
+  loading,
+  buttons,
+  filters,
+  withNumbersToggle,
+  ...props
+}: HeaderProps) {
+  const { classes } = useStyles();
+  const isSmallScreen = useBreakpoints({ smallerThan: 'sm' });
   const [visibleFilters, setVisibleFilters] = useLocalStorage({
     key: 'visible-filters',
     defaultValue: true,
+    getInitialValueInEffect: false,
   });
   const [visibleNumbers, setVisibleNumbers] = useLocalStorage({
     key: 'visible-numbers',
     defaultValue: true,
+    getInitialValueInEffect: false,
   });
   const [visibleSidePanel, setVisibleSidePanel] = useLocalStorage({
     key: 'visible-side-panel',
     defaultValue: true,
+    getInitialValueInEffect: false,
   });
+  const [debouncedLoading] = useDebouncedValue(loading, 100);
 
   const toggleVisibleFilters = () => setVisibleFilters((prevState) => !prevState);
   const toggleVisibleNumbers = () => setVisibleNumbers((prevState) => !prevState);
   const toggleVisibleSidePanel = () => setVisibleSidePanel((prevState) => !prevState);
 
   return (
-    <MantineHeader height="fit-content" p="lg" zIndex={2} sx={{ position: 'relative', ...sx }}>
-      <Box className={cx(classes.modalContainer, 'modal-container')} />
-      <Group align="flex-start" mb="md">
+    <MantineHeader height="fit-content" p="lg" zIndex={2} {...props}>
+      <Group mb="md" spacing="xl">
         <Title order={1}>{title}</Title>
-        <Group spacing={8} ml="auto" mt={6}>
-          {filters && (
-            <Tooltip label={visibleFilters ? 'Hide filters' : 'Show filters'} withinPortal>
-              <Button
-                variant={visibleFilters ? 'light' : 'subtle'}
-                px="xs"
-                onClick={toggleVisibleFilters}
-              >
-                {visibleFilters ? <RiFilterLine /> : <RiFilterOffLine />}
-              </Button>
-            </Tooltip>
+        <AnimatePresence>
+          {loading && debouncedLoading && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <Loader sx={{ alignSelf: 'center' }} />
+            </motion.div>
           )}
+        </AnimatePresence>
+        <Group spacing={8} ml="auto" mt={6} sx={{ alignSelf: 'flex-start' }}>
           {withNumbersToggle && (
             <Tooltip label={visibleNumbers ? 'Hide numbers' : 'Show numbers'} withinPortal>
               <Button
@@ -108,7 +120,18 @@ function Header({ children, title, buttons, filters, withNumbersToggle, sx }: He
               </Button>
             </Tooltip>
           )}
-          {!isMobile && (
+          {filters && (
+            <Tooltip label={visibleFilters ? 'Hide filters' : 'Show filters'} withinPortal>
+              <Button
+                variant={visibleFilters ? 'light' : 'subtle'}
+                px="xs"
+                onClick={toggleVisibleFilters}
+              >
+                {visibleFilters ? <RiFilterLine /> : <RiFilterOffLine />}
+              </Button>
+            </Tooltip>
+          )}
+          {!isSmallScreen && (
             <Tooltip label={visibleSidePanel ? 'Hide side panel' : 'Show side panel'} withinPortal>
               <Button
                 variant={visibleSidePanel ? 'light' : 'subtle'}
@@ -135,7 +158,36 @@ function Header({ children, title, buttons, filters, withNumbersToggle, sx }: He
 }
 
 function Body({ children, sx }: BodyProps) {
-  return <Stack sx={{ overflow: 'auto', flex: 1, ...sx }}>{children}</Stack>;
+  const theme = useMantineTheme();
+  const { scroll, scrollTo, targetRef } = useScroll<HTMLDivElement>();
+
+  return (
+    <Stack ref={targetRef} sx={{ position: 'relative', overflow: 'auto', flex: 1, ...sx }}>
+      {children}
+      <Affix
+        position={{ bottom: 0, left: 0, right: 0 }}
+        target={targetRef.current ?? undefined}
+        withinPortal={false}
+        zIndex={0}
+        sx={{ marginInline: 'auto', position: 'sticky' }}
+      >
+        <Transition transition="slide-up" mounted={scroll.y > 100}>
+          {(styles) => (
+            <Button
+              variant="light"
+              leftIcon={<RiArrowUpLine />}
+              mb="lg"
+              style={styles}
+              onClick={() => scrollTo({ top: 0, behavior: 'smooth' })}
+              sx={{ boxShadow: theme.shadows.md }}
+            >
+              Scroll to top
+            </Button>
+          )}
+        </Transition>
+      </Affix>
+    </Stack>
+  );
 }
 
 MainLayout.Header = Header;

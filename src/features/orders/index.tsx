@@ -1,49 +1,47 @@
-import { useState } from 'react';
-import { MainLayout, Table } from 'components';
-import { orderBy, OrderByDirection, query, where } from 'firebase/firestore';
+import { ListManager, Load, MainLayout, Table } from 'components';
+import { orderBy, query, where } from 'firebase/firestore';
 import { clientsCollection, ordersCollection } from 'lib/firebase/collections';
-import {
-  useCollectionDataPersistent,
-} from 'lib/react-firebase-hooks/useCollectionDataPersistent';
+import { addClient } from 'lib/firebase/utils';
+import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
+import { useState } from 'react';
 import { RiAddLine, RiUserSettingsLine } from 'react-icons/ri';
 import { Filters } from 'types/filters';
 import { Order } from 'types/order';
-import { Button, Center, Loader } from '@mantine/core';
+import { Button } from '@mantine/core';
 import { useDisclosure, useLocalStorage } from '@mantine/hooks';
-import { ClientList, OrderFilters, OrderForm, OrderItem } from './components';
+import { OrderFilters, OrderForm, OrderItem } from './components';
 
-export default function Orders() {
-  const [visibleNumbers] = useLocalStorage({ key: 'visible-numbers', defaultValue: true });
+interface OrdersPageProps {
+  visibleNumbers: boolean;
+}
 
+export default function OrdersPage({ visibleNumbers }: OrdersPageProps) {
   const clientsQuery = query(clientsCollection, orderBy('name', 'asc'));
-  const [clients] = useCollectionDataPersistent(clientsQuery);
+  const [clients, clientsLoading] = useCollectionDataPersistent(clientsQuery);
 
-  const [statusFilter] = useLocalStorage<Filters.Status>({
-    key: 'status-filter',
-    defaultValue: 'all',
+  const [filters, setFilters] = useLocalStorage<Filters.Order>({
+    key: 'order-filters',
+    defaultValue: {
+      status: 'all',
+      orderBy: 'receivedTimestamp',
+      direction: 'desc',
+      clients: [],
+    },
+    getInitialValueInEffect: false,
   });
-  const [orderByFilter] = useLocalStorage<Filters.OrderBy>({
-    key: 'order-by-filter',
-    defaultValue: 'receivedTimestamp',
-  });
-  const [directionFilter] = useLocalStorage<OrderByDirection>({
-    key: 'direction-filter',
-    defaultValue: 'desc',
-  });
-  const [clientsFilter] = useLocalStorage<string[]>({
-    key: 'clients-filter',
-    defaultValue: [],
-  });
+  const updateFilter = (value: Partial<Filters.Order>) => {
+    setFilters((prevState) => ({ ...prevState, ...value }));
+  };
 
-  const ordersQueryConstraints = [orderBy(orderByFilter, directionFilter)];
-  if (statusFilter !== 'all') {
-    ordersQueryConstraints.push(where('status', '==', statusFilter));
+  const ordersQueryConstraints = [orderBy(filters.orderBy, filters.direction)];
+  if (filters.status !== 'all') {
+    ordersQueryConstraints.push(where('status', '==', filters.status));
   }
-  if (clientsFilter.length) {
-    ordersQueryConstraints.push(where('clientId', 'in', clientsFilter));
+  if (filters.clients.length) {
+    ordersQueryConstraints.push(where('clientId', 'in', filters.clients));
   }
   const ordersQuery = query(ordersCollection, ...ordersQueryConstraints);
-  const [orders] = useCollectionDataPersistent(ordersQuery);
+  const [orders, ordersLoading] = useCollectionDataPersistent(ordersQuery);
 
   const [orderFormOpened, orderFormHandler] = useDisclosure(false);
   const [clientListOpened, clientListHandler] = useDisclosure(false);
@@ -53,6 +51,7 @@ export default function Orders() {
     <MainLayout>
       <MainLayout.Header
         title="Orders"
+        loading={clientsLoading || ordersLoading}
         buttons={
           <>
             <Button
@@ -73,7 +72,7 @@ export default function Orders() {
             </Button>
           </>
         }
-        filters={<OrderFilters clients={clients} />}
+        filters={<OrderFilters clients={clients} filters={filters} updateFilter={updateFilter} />}
         withNumbersToggle
       />
       <MainLayout.Body>
@@ -83,8 +82,14 @@ export default function Orders() {
           values={formValues}
           clients={clients}
         />
-        <ClientList opened={clientListOpened} close={clientListHandler.close} clients={clients} />
-        {clients && orders ? (
+        <ListManager
+          opened={clientListOpened}
+          close={clientListHandler.close}
+          label="client"
+          items={clients}
+          addItem={addClient}
+        />
+        <Load in={!!(clients && orders)}>
           <Table>
             <Table.Header>
               <th style={{ width: 0 }}>Status</th>
@@ -95,11 +100,11 @@ export default function Orders() {
               <th style={{ width: 0 }} />
             </Table.Header>
             <Table.Body>
-              {orders.map((order) => (
+              {orders?.map((order) => (
                 <OrderItem
                   key={order.id}
                   order={order}
-                  clientName={clients.find((client) => client.id === order.clientId)?.name}
+                  clientName={clients?.find((client) => client.id === order.clientId)?.name}
                   visibleNumbers={visibleNumbers}
                   setFormValues={setFormValues}
                   openOrderForm={orderFormHandler.open}
@@ -107,11 +112,7 @@ export default function Orders() {
               ))}
             </Table.Body>
           </Table>
-        ) : (
-          <Center sx={{ flex: 1 }}>
-            <Loader />
-          </Center>
-        )}
+        </Load>
       </MainLayout.Body>
     </MainLayout>
   );

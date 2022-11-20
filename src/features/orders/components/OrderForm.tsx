@@ -1,19 +1,11 @@
-import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { getDoc } from 'firebase/firestore';
 import { addClient, addOrder, editOrder } from 'lib/firebase/utils';
+import { useEffect, useState } from 'react';
 import { RiMoneyDollarCircleLine, RiUserLine } from 'react-icons/ri';
 import { Client } from 'types/client';
 import { Order } from 'types/order';
-import {
-  Button,
-  Group,
-  Loader,
-  Modal,
-  NumberInput,
-  Select,
-  Title,
-} from '@mantine/core';
+import { Button, Group, Loader, Modal, NumberInput, Select, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
 interface OrderFormProps {
@@ -28,6 +20,8 @@ interface InitialValues {
   price: number | null;
 }
 
+const MAX_PRICE = 999999999;
+
 export default function OrderForm({ opened, closeForm, values, clients }: OrderFormProps) {
   const form = useForm({
     initialValues: {
@@ -35,7 +29,18 @@ export default function OrderForm({ opened, closeForm, values, clients }: OrderF
       price: null,
     } as InitialValues,
     validate: {
-      clientId: (value) => (value?.length ? null : 'Invalid client'),
+      clientId: (value) => (value ? null : 'Invalid client'),
+      price: (value: number) => {
+        if (value == null) {
+          return 'Invalid price';
+        }
+        if (value < 0) {
+          return 'Price cannot be less than 0';
+        }
+        if (value > MAX_PRICE) {
+          return `Price cannot be greater than ${MAX_PRICE}`;
+        }
+      },
     },
   });
   const [isClientLoading, setIsClientLoading] = useState(false);
@@ -78,7 +83,7 @@ export default function OrderForm({ opened, closeForm, values, clients }: OrderF
         <Group align="flex-start" spacing="sm" grow>
           <Select
             label="Client"
-            data={clients?.map((client) => ({ value: client.id, label: client.name }))}
+            data={clients?.map((client) => ({ value: client.id, label: client.name })) ?? []}
             icon={isClientLoading ? <Loader size={16} /> : <RiUserLine />}
             placeholder={isClientLoading ? 'Loading client...' : 'Select client'}
             nothingFound="Client not found"
@@ -104,7 +109,7 @@ export default function OrderForm({ opened, closeForm, values, clients }: OrderF
             icon={<RiMoneyDollarCircleLine />}
             placeholder="Pending"
             min={0}
-            max={999999999}
+            max={MAX_PRICE}
             data-autofocus
             {...form.getInputProps('price')}
           />

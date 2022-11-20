@@ -1,23 +1,29 @@
 import { forwardRef } from 'react';
 import { IconType } from 'react-icons';
 import { Button, createStyles, Tooltip } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
 
 interface SidebarButtonProps {
   icon: IconType;
   label: string;
+  small?: boolean;
   active?: boolean;
   onClick?(): void;
 }
 
-const useStyles = createStyles((theme, { isMobile }: { isMobile: boolean }) => ({
+const useStyles = createStyles((theme) => ({
   link: {
-    width: isMobile ? 'auto' : 50,
-    height: isMobile ? 'auto' : 50,
+    width: 50,
+    height: 50,
     padding: theme.spacing.sm,
     display: 'flex',
-    justifyContent: isMobile ? 'flex-start' : 'center',
+    justifyContent: 'center',
     color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.colors.gray[7],
+
+    [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
+      width: 'auto',
+      height: 'auto',
+      justifyContent: 'flex-start',
+    },
 
     '&:hover': {
       backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2],
@@ -32,22 +38,21 @@ const useStyles = createStyles((theme, { isMobile }: { isMobile: boolean }) => (
 }));
 
 const SidebarButton = forwardRef<HTMLButtonElement, SidebarButtonProps>(function SidebarButton(
-  { icon: Icon, label, active, onClick },
+  { icon: Icon, label, small, active, onClick },
   ref,
 ) {
-  const isMobile = useMediaQuery('(max-width: 600px)');
-  const { classes, cx } = useStyles({ isMobile });
+  const { classes, cx } = useStyles();
 
   return (
-    <Tooltip label={label} position="right" disabled={active || isMobile}>
+    <Tooltip label={label} position="right" disabled={active || small}>
       <Button
         ref={ref}
         variant="subtle"
-        leftIcon={isMobile && <Icon />}
+        leftIcon={small && <Icon />}
         onClick={onClick}
         className={cx(classes.link, { [classes.active]: active })}
       >
-        {isMobile ? label : <Icon size={18} />}
+        {small ? label : <Icon size={18} />}
       </Button>
     </Tooltip>
   );

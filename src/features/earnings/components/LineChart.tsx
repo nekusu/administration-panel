@@ -1,13 +1,6 @@
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import {
-  Box,
-  ColorSwatch,
-  Group,
-  Paper,
-  Text,
-  useMantineTheme,
-} from '@mantine/core';
+import { Box, ColorSwatch, Group, Paper, Text, useMantineTheme } from '@mantine/core';
 import { linearGradientDef } from '@nivo/core';
 import { ResponsiveLine, Serie } from '@nivo/line';
 
@@ -15,8 +8,8 @@ interface LineChartProps {
   data: Serie[];
   timeUnit: 'day' | 'month';
   height?: number;
-  showLeftTicks: boolean;
-  showBottomTicks: boolean;
+  enableLeftTicks: boolean;
+  enableBottomTicks: boolean;
 }
 
 dayjs.extend(customParseFormat);
@@ -25,8 +18,8 @@ export default function LineChart({
   data,
   timeUnit,
   height = 260,
-  showLeftTicks,
-  showBottomTicks,
+  enableLeftTicks,
+  enableBottomTicks,
 }: LineChartProps) {
   const theme = useMantineTheme();
 
@@ -38,8 +31,8 @@ export default function LineChart({
           margin={{
             top: 6,
             right: 12,
-            bottom: showBottomTicks ? 28 : 6,
-            left: showLeftTicks ? 56 : 12,
+            bottom: enableBottomTicks ? 28 : 6,
+            left: enableLeftTicks ? 56 : 12,
           }}
           xScale={{
             type: 'time',
