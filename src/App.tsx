@@ -3,9 +3,12 @@ import { useDisclosure, useLocalStorage } from '@mantine/hooks';
 import { FloatingButton, MantineProviders, Sidebar, SidePanel } from 'components';
 import Earnings from 'features/earnings';
 import OrdersPage from 'features/orders';
+import StockPage from 'features/stock';
+import StockGroup from 'features/stock-group';
 import { MotionConfig } from 'framer-motion';
 import useBreakpoints from 'lib/mantine/useBreakpoints';
 import { RiLayoutRightLine, RiMenuLine } from 'react-icons/ri';
+import { Stock } from 'types/stock';
 
 export default function App() {
   const isSmallScreen = useBreakpoints({ smallerThan: 'sm' });
@@ -24,11 +27,21 @@ export default function App() {
     defaultValue: true,
     getInitialValueInEffect: false,
   });
+  const [activeGroup, setActiveGroup] = useLocalStorage<Stock.Group | undefined>({
+    key: 'active-group',
+    getInitialValueInEffect: false,
+  });
   const [sidebarOpened, sidebarHandler] = useDisclosure(false);
 
-  const pages = [<OrdersPage visibleNumbers={visibleNumbers} />];
-  const sidePanelTitles = ['Earnings'];
-  const sidePanels = [<Earnings visibleNumbers={visibleNumbers} />];
+  const pages = [
+    <OrdersPage visibleNumbers={visibleNumbers} />,
+    <StockPage activeGroup={activeGroup} setActiveGroup={setActiveGroup} />,
+  ];
+  const sidePanelTitles = ['Earnings', activeGroup?.name];
+  const sidePanels = [
+    <Earnings visibleNumbers={visibleNumbers} />,
+    <StockGroup activeGroup={activeGroup} />,
+  ];
 
   return (
     <MantineProviders>

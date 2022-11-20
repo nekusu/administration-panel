@@ -13,4 +13,13 @@ export namespace Filters {
     enableLeftTicks: boolean;
     enableBottomTicks: boolean;
   }
+  export interface Stock {
+    orderBy: 'code' | 'quantity';
+    direction: OrderByDirection;
+  }
+  export interface StockGroup {
+    enabledMarkers: string[];
+    enableLeftTicks: boolean;
+    enableLabels: boolean;
+  }
 }
