@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/administration-panel/static/js/main.dc3aba16.js",
+    "index.html": "/administration-panel/index.html",
+    "main.dc3aba16.js.map": "/administration-panel/static/js/main.dc3aba16.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.dc3aba16.js"
+  ]
+}
