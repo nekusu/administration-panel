@@ -1,10 +1,10 @@
+import { ActionIcon, Text, TextInput, Title, Tooltip, useMantineTheme } from '@mantine/core';
+import { useClickOutside, useInputState } from '@mantine/hooks';
+import { openConfirmModal } from '@mantine/modals';
 import { motion } from 'framer-motion';
 import { deleteDocument, editDocument } from 'lib/firebase/utils';
 import { useEffect, useRef, useState } from 'react';
 import { RiCheckLine, RiDeleteBin7Line, RiPencilLine } from 'react-icons/ri';
-import { ActionIcon, Text, TextInput, Title, Tooltip, useMantineTheme } from '@mantine/core';
-import { useClickOutside, useInputState } from '@mantine/hooks';
-import { openConfirmModal } from '@mantine/modals';
 
 interface SampleType {
   id: string;
@@ -48,6 +48,7 @@ export default function ListItem<T extends SampleType>({ item, label }: ListItem
       ref={listItemRef}
       style={{ display: 'flex', alignItems: 'center' }}
       layoutId={item.id}
+      layoutScroll
     >
       {editMode ? (
         <>

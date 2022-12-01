@@ -1,6 +1,6 @@
+import { createStyles, Table as MantineTable } from '@mantine/core';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ReactNode } from 'react';
-import { createStyles, Table as MantineTable } from '@mantine/core';
 
 const useStyles = createStyles((theme) => ({
   thead: {
@@ -46,6 +46,7 @@ function Row({ children, layoutId, ...props }: { children: ReactNode; layoutId: 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      layoutScroll
       {...props}
     >
       {children}
