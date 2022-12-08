@@ -9,13 +9,14 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { useForm, zodResolver } from '@mantine/form';
 import { getDoc } from 'firebase/firestore';
 import { addStockGroup, addStockItem } from 'lib/firebase/utils';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { RiFolder3Line, RiHashtag, RiNumbersLine } from 'react-icons/ri';
 import tinycolor from 'tinycolor2';
 import { Stock } from 'types/stock';
+import { z } from 'zod';
 import { MultiFormatColorInput } from './';
 
 interface StockItemFormProps {
@@ -26,7 +27,25 @@ interface StockItemFormProps {
   setActiveGroup: Dispatch<SetStateAction<Stock.Group | undefined>>;
 }
 
-const MAX_QUANTITY = 999999;
+interface FormValues {
+  stockGroupId: string;
+  code: string;
+  quantity: number;
+  color: string;
+}
+
+const MAX_CODE_LENGTH = 20;
+const MAX_QUANTITY = 1000000;
+const schema = z.object({
+  stockGroupId: z.string({ invalid_type_error: 'Required' }).trim().min(1, { message: 'Required' }),
+  code: z.string().trim().min(1, { message: 'Required' }).max(MAX_CODE_LENGTH),
+  quantity: z.number({ invalid_type_error: 'Required' }).min(0).max(MAX_QUANTITY),
+  color: z
+    .string()
+    .refine((value) => !value || ['hex', 'rgb', 'hsl'].includes(tinycolor(value).getFormat()), {
+      message: 'Invalid color',
+    }),
+});
 
 export default function StockItemForm({
   opened,
@@ -35,44 +54,14 @@ export default function StockItemForm({
   stockGroups,
   setActiveGroup,
 }: StockItemFormProps) {
-  const form = useForm({
+  const form = useForm<FormValues>({
     initialValues: {
       stockGroupId: '',
       code: '',
       quantity: 0,
       color: '',
     },
-    validate: {
-      stockGroupId: (value) => (value ? null : 'Invalid group'),
-      code: (value) => {
-        if (!value) {
-          return 'Invalid code';
-        }
-        if (stockItems?.some((stockItem) => stockItem.code === value)) {
-          return 'Code already exists';
-        }
-      },
-      quantity: (value) => {
-        if (value == null) {
-          return 'Invalid quantity';
-        }
-        if (value < 0) {
-          return 'Quantity cannot be less than 0';
-        }
-        if (value > MAX_QUANTITY) {
-          return `Quantity cannot be greater than ${MAX_QUANTITY}`;
-        }
-      },
-      color: (value) => {
-        if (!value) {
-          return null;
-        }
-        const color = tinycolor(value);
-        if (!['hex', 'rgb', 'hsl'].includes(color.getFormat())) {
-          return 'Invalid color';
-        }
-      },
-    },
+    validate: zodResolver(schema),
   });
   const [isGroupLoading, setIsGroupLoading] = useState(false);
 
@@ -97,8 +86,7 @@ export default function StockItemForm({
       <form
         onSubmit={form.onSubmit(({ stockGroupId, ...data }) => {
           closeForm();
-          addStockItem(stockGroupId, data);
-          console.log(data);
+          addStockItem(stockGroupId, schema.omit({ stockGroupId: true }).parse(data));
         })}
       >
         <SimpleGrid cols={2} spacing="sm">
@@ -130,12 +118,12 @@ export default function StockItemForm({
             label="Code"
             icon={<RiHashtag />}
             placeholder="Enter code"
-            maxLength={20}
+            maxLength={MAX_CODE_LENGTH}
             data-autofocus
             {...form.getInputProps('code')}
           />
           <NumberInput
-            label="Amount"
+            label="Quantity"
             icon={<RiNumbersLine />}
             placeholder="Enter quantity"
             min={0}

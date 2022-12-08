@@ -1,10 +1,3 @@
-import { Load } from 'components';
-import { AnimatePresence, motion } from 'framer-motion';
-import { addStockMarker } from 'lib/firebase/utils';
-import { useEffect } from 'react';
-import { RiAddLine, RiBarChart2Line, RiPriceTag3Line } from 'react-icons/ri';
-import { Filters } from 'types/filters';
-import { Stock } from 'types/stock';
 import {
   ActionIcon,
   Button,
@@ -20,8 +13,16 @@ import {
   Tooltip,
   useMantineTheme,
 } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { useForm, zodResolver } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
+import { Load } from 'components';
+import { AnimatePresence, motion } from 'framer-motion';
+import { addStockMarker } from 'lib/firebase/utils';
+import { useEffect } from 'react';
+import { RiAddLine, RiBarChart2Line, RiPriceTag3Line } from 'react-icons/ri';
+import { Filters } from 'types/filters';
+import { Stock } from 'types/stock';
+import { z } from 'zod';
 import { StockMarker } from './';
 
 interface StockGroupFiltersProps {
@@ -30,7 +31,21 @@ interface StockGroupFiltersProps {
   filters: Filters.StockGroup;
   updateFilter(value: Partial<Filters.StockGroup>): void;
 }
-const MAX_VALUE = 999999;
+
+interface FormValues {
+  color: number;
+  name: string;
+  value?: number;
+}
+
+const MAX_NAME_LENGTH = 10;
+const MIN_VALUE = 1;
+const MAX_VALUE = 100000;
+const schema = z.object({
+  color: z.number(),
+  name: z.string().trim().min(1, { message: 'Required' }).max(MAX_NAME_LENGTH),
+  value: z.number({ invalid_type_error: 'Required' }).min(MIN_VALUE).max(MAX_VALUE),
+});
 
 export default function StockGroupFilters({
   markers,
@@ -39,22 +54,9 @@ export default function StockGroupFilters({
   updateFilter,
 }: StockGroupFiltersProps) {
   const theme = useMantineTheme();
-  const form = useForm({
-    initialValues: { color: 0, name: '', value: 0 },
-    validate: {
-      name: (value) => (value ? null : 'Invalid name'),
-      value: (value) => {
-        if (value == null) {
-          return 'Invalid value';
-        }
-        if (value < 1) {
-          return 'Value cannot be less than 1';
-        }
-        if (value > MAX_VALUE) {
-          return `Value cannot be greater than ${MAX_VALUE}`;
-        }
-      },
-    },
+  const form = useForm<FormValues>({
+    initialValues: { color: 0, name: '' },
+    validate: zodResolver(schema),
   });
   const [markerPopoverOpened, markerPopoverHandler] = useDisclosure(false);
 
@@ -95,13 +97,12 @@ export default function StockGroupFilters({
       </Popover.Target>
       <Popover.Dropdown p="md">
         <form
-          onSubmit={form.onSubmit(({ color, name, value }) => {
+          onSubmit={form.onSubmit(({ color, ...data }) => {
             if (activeGroup) {
               markerPopoverHandler.close();
               addStockMarker(activeGroup.id, {
                 color: `hsl(${color}, 100%, 50%)`,
-                name,
-                value,
+                ...schema.omit({ color: true }).parse(data),
               });
             }
           })}
@@ -117,7 +118,7 @@ export default function StockGroupFilters({
                 label="Name"
                 icon={<RiPriceTag3Line />}
                 placeholder="Enter name"
-                maxLength={10}
+                maxLength={MAX_NAME_LENGTH}
                 data-autofocus
                 {...form.getInputProps('name')}
               />
@@ -125,7 +126,7 @@ export default function StockGroupFilters({
                 label="Value"
                 icon={<RiBarChart2Line />}
                 placeholder="Enter value"
-                min={1}
+                min={MIN_VALUE}
                 max={MAX_VALUE}
                 {...form.getInputProps('value')}
               />

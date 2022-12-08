@@ -1,5 +1,5 @@
 import { Button, Group, Loader, Modal, NumberInput, Select, Title } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { useForm, zodResolver } from '@mantine/form';
 import dayjs from 'dayjs';
 import { getDoc } from 'firebase/firestore';
 import { addClient, addOrder, editOrder } from 'lib/firebase/utils';
@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { RiMoneyDollarCircleLine, RiUserLine } from 'react-icons/ri';
 import { Client } from 'types/client';
 import { Order } from 'types/order';
+import { z } from 'zod';
 
 interface OrderFormProps {
   opened: boolean;
@@ -15,40 +16,28 @@ interface OrderFormProps {
   clients?: Client[];
 }
 
-interface InitialValues {
+interface FormValues {
   clientId: string;
-  price: number | null;
+  price?: number;
 }
 
-const MAX_PRICE = 999999999;
+const MAX_PRICE = 1000000;
+const schema = z.object({
+  clientId: z.string({ invalid_type_error: 'Required' }).trim().min(1, { message: 'Required' }),
+  price: z.number().min(0).max(MAX_PRICE).optional().default(0),
+});
 
 export default function OrderForm({ opened, closeForm, values, clients }: OrderFormProps) {
-  const form = useForm({
-    initialValues: {
-      clientId: '',
-      price: null,
-    } as InitialValues,
-    validate: {
-      clientId: (value) => (value ? null : 'Invalid client'),
-      price: (value) => {
-        if (value == null) {
-          return 'Invalid price';
-        }
-        if (value < 0) {
-          return 'Price cannot be less than 0';
-        }
-        if (value > MAX_PRICE) {
-          return `Price cannot be greater than ${MAX_PRICE}`;
-        }
-      },
-    },
+  const form = useForm<FormValues>({
+    initialValues: { clientId: '' },
+    validate: zodResolver(schema),
   });
   const [isClientLoading, setIsClientLoading] = useState(false);
 
   useEffect(() => {
     if (opened) {
       if (values) {
-        form.setValues({ ...values, price: values.price === 0 ? null : values.price });
+        form.setValues({ ...values, price: values.price || undefined });
       } else {
         form.reset();
       }
@@ -65,14 +54,13 @@ export default function OrderForm({ opened, closeForm, values, clients }: OrderF
       target=".modal-container"
     >
       <form
-        onSubmit={form.onSubmit(({ clientId, price }) => {
+        onSubmit={form.onSubmit((data) => {
           closeForm();
           if (values) {
-            editOrder(values.id, { clientId, price: price || 0 });
+            editOrder(values.id, schema.parse(data));
           } else {
             addOrder({
-              clientId,
-              price: price || 0,
+              ...schema.parse(data),
               status: 'pending',
               receivedTimestamp: dayjs().valueOf(),
               deliveredTimestamp: null,

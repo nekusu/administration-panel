@@ -10,7 +10,7 @@ import {
   Tooltip,
   useMantineTheme,
 } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { useForm, zodResolver } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { openConfirmModal } from '@mantine/modals';
 import { Table } from 'components';
@@ -29,6 +29,7 @@ import {
   RiUserFollowLine,
 } from 'react-icons/ri';
 import { Order } from 'types/order';
+import { z } from 'zod';
 
 interface OrderItemProps {
   order: Order;
@@ -38,6 +39,10 @@ interface OrderItemProps {
   openOrderForm: () => void;
 }
 
+interface FormValues {
+  price?: number;
+}
+
 dayjs.extend(calendar);
 dayjs.extend(localizedFormat);
 const STATUS_ITEMS = {
@@ -45,7 +50,11 @@ const STATUS_ITEMS = {
   finished: { color: 'green', icon: <RiCheckLine /> },
   delivered: { color: 'cyan', icon: <RiUserFollowLine /> },
 };
-const MAX_PRICE = 999999999;
+const MIN_PRICE = 1;
+const MAX_PRICE = 1000000;
+const schema = z.object({
+  price: z.number({ invalid_type_error: 'Required' }).min(MIN_PRICE).max(MAX_PRICE),
+});
 
 export default function OrderItem({
   order,
@@ -56,21 +65,9 @@ export default function OrderItem({
 }: OrderItemProps) {
   const theme = useMantineTheme();
   const isSmallScreen = useBreakpoints({ smallerThan: 'sm' });
-  const form = useForm({
-    initialValues: { price: null } as { price: number | null },
-    validate: {
-      price: (value) => {
-        if (value == null) {
-          return 'Invalid price';
-        }
-        if (value < 1) {
-          return 'Price cannot be less than 1';
-        }
-        if (value > MAX_PRICE) {
-          return `Price cannot be greater than ${MAX_PRICE}`;
-        }
-      },
-    },
+  const form = useForm<FormValues>({
+    initialValues: {},
+    validate: zodResolver(schema),
   });
   const [pricePopoverOpened, pricePopoverHandler] = useDisclosure(false);
 
@@ -157,18 +154,16 @@ export default function OrderItem({
           </Popover.Target>
           <Popover.Dropdown>
             <form
-              onSubmit={form.onSubmit(({ price }) => {
-                if (price) {
-                  pricePopoverHandler.close();
-                  editOrder(order.id, { status: 'finished', price });
-                }
+              onSubmit={form.onSubmit((data) => {
+                pricePopoverHandler.close();
+                editOrder(order.id, { status: 'finished', ...schema.parse(data) });
               })}
             >
               <Group spacing="sm" align="flex-start">
                 <NumberInput
                   icon={<RiMoneyDollarCircleLine />}
                   placeholder="Enter price"
-                  min={1}
+                  min={MIN_PRICE}
                   max={MAX_PRICE}
                   {...form.getInputProps('price')}
                 />

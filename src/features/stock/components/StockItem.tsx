@@ -1,9 +1,3 @@
-import { QuantityInput, Table } from 'components';
-import { deleteStockItem, editStockItem } from 'lib/firebase/utils';
-import { useEffect, useState } from 'react';
-import { RiCheckLine, RiDeleteBin7Line } from 'react-icons/ri';
-import tinycolor from 'tinycolor2';
-import { Stock } from 'types/stock';
 import {
   ActionIcon,
   ColorSwatch,
@@ -13,9 +7,16 @@ import {
   Tooltip,
   useMantineTheme,
 } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { useForm, zodResolver } from '@mantine/form';
 import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
 import { openConfirmModal } from '@mantine/modals';
+import { QuantityInput, Table } from 'components';
+import { deleteStockItem, editStockItem } from 'lib/firebase/utils';
+import { useEffect, useState } from 'react';
+import { RiCheckLine, RiDeleteBin7Line } from 'react-icons/ri';
+import tinycolor from 'tinycolor2';
+import { Stock } from 'types/stock';
+import { z } from 'zod';
 import { MultiFormatColorInput } from './';
 
 interface StockItemProps {
@@ -23,18 +24,23 @@ interface StockItemProps {
   activeGroup?: Stock.Group;
 }
 
+interface FormValues {
+  color: string;
+}
+
+const schema = z.object({
+  color: z
+    .string()
+    .refine((value) => !value || ['hex', 'rgb', 'hsl'].includes(tinycolor(value).getFormat()), {
+      message: 'Invalid color',
+    }),
+});
+
 export default function Item({ item, activeGroup }: StockItemProps) {
   const theme = useMantineTheme();
-  const form = useForm({
+  const form = useForm<FormValues>({
     initialValues: { color: '' },
-    validate: {
-      color: (value) => {
-        const color = tinycolor(value);
-        if (!(value && ['hex', 'rgb', 'hsl'].includes(color.getFormat()))) {
-          return 'Invalid color';
-        }
-      },
-    },
+    validate: zodResolver(schema),
   });
   const [colorPopoverOpened, colorPopoverHandler] = useDisclosure(false);
   const [quantity, setQuantity] = useState(item.quantity);
@@ -42,7 +48,6 @@ export default function Item({ item, activeGroup }: StockItemProps) {
 
   useEffect(() => {
     if (colorPopoverOpened) {
-      console.log(item.color);
       form.reset();
       if (item.color) {
         form.setFieldValue('color', item.color);
@@ -91,10 +96,10 @@ export default function Item({ item, activeGroup }: StockItemProps) {
           </Popover.Target>
           <Popover.Dropdown>
             <form
-              onSubmit={form.onSubmit(({ color }) => {
+              onSubmit={form.onSubmit((data) => {
                 if (activeGroup) {
                   colorPopoverHandler.close();
-                  editStockItem(activeGroup.id, item.id, { color });
+                  editStockItem(activeGroup.id, item.id, schema.parse(data));
                 }
               })}
             >
