@@ -1,3 +1,5 @@
+import { Button, Collapse, createStyles, Tabs } from '@mantine/core';
+import { useDebouncedState, useDisclosure, useLocalStorage } from '@mantine/hooks';
 import { ListManager, Load, MainLayout, Table } from 'components';
 import { getDoc, orderBy, query } from 'firebase/firestore';
 import { stockGroupsCollection, stockItemsCollection } from 'lib/firebase/collections';
@@ -7,8 +9,6 @@ import { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
 import { RiAddLine, RiFolderSettingsLine } from 'react-icons/ri';
 import { Filters } from 'types/filters';
 import { Stock } from 'types/stock';
-import { Button, Collapse, createStyles, Tabs } from '@mantine/core';
-import { useDebouncedState, useDisclosure, useLocalStorage } from '@mantine/hooks';
 import { StockFilters, StockForm, StockItem } from './components';
 
 interface StockPageProps {
@@ -125,7 +125,6 @@ export default function StockPage({ activeGroup, setActiveGroup }: StockPageProp
           opened={stockFormOpened}
           closeForm={stockFormHandler.close}
           stockGroups={stockGroups}
-          stockItems={stockItems}
           activeGroup={activeGroup}
           setActiveGroup={setActiveGroup}
         />

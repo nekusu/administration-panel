@@ -22,7 +22,6 @@ interface StockItemFormProps {
   opened: boolean;
   closeForm(): void;
   stockGroups?: Stock.Group[];
-  stockItems?: Stock.Item[];
   activeGroup?: Stock.Group;
   setActiveGroup: Dispatch<SetStateAction<Stock.Group | undefined>>;
 }
@@ -34,7 +33,6 @@ export default function StockItemForm({
   closeForm,
   activeGroup,
   stockGroups,
-  stockItems,
   setActiveGroup,
 }: StockItemFormProps) {
   const form = useForm({
