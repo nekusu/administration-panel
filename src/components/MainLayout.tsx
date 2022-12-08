@@ -1,17 +1,3 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import useScroll from 'hooks/useScroll';
-import useBreakpoints from 'lib/mantine/useBreakpoints';
-import useWindowSize from 'lib/mantine/useWindowSize';
-import { ReactNode } from 'react';
-import {
-  RiArrowUpLine,
-  RiEyeLine,
-  RiEyeOffLine,
-  RiFilterLine,
-  RiFilterOffLine,
-  RiLayoutRight2Line,
-  RiLayoutRightLine,
-} from 'react-icons/ri';
 import {
   Affix,
   Box,
@@ -30,6 +16,20 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { useDebouncedValue, useLocalStorage } from '@mantine/hooks';
+import { AnimatePresence, motion } from 'framer-motion';
+import useScroll from 'hooks/useScroll';
+import useBreakpoints from 'lib/mantine/useBreakpoints';
+import useWindowSize from 'lib/mantine/useWindowSize';
+import { ReactNode } from 'react';
+import {
+  RiArrowUpLine,
+  RiEyeLine,
+  RiEyeOffLine,
+  RiFilterLine,
+  RiFilterOffLine,
+  RiLayoutRight2Line,
+  RiLayoutRightLine,
+} from 'react-icons/ri';
 
 interface HeaderProps extends Omit<MantineHeaderProps, 'children' | 'height'> {
   children?: ReactNode;
@@ -98,7 +98,7 @@ function Header({
   const toggleVisibleSidePanel = () => setVisibleSidePanel((prevState) => !prevState);
 
   return (
-    <MantineHeader height="fit-content" p="lg" zIndex={2} {...props}>
+    <MantineHeader height="fit-content" p="lg" {...props} styles={{ root: { zIndex: 2 } }}>
       <Group mb="md" spacing="xl">
         <Title order={1}>{title}</Title>
         <AnimatePresence>
