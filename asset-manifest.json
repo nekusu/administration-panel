@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/administration-panel/static/js/main.1bd5cb4e.js",
+    "main.js": "/administration-panel/static/js/main.08247b99.js",
     "index.html": "/administration-panel/index.html",
-    "main.1bd5cb4e.js.map": "/administration-panel/static/js/main.1bd5cb4e.js.map"
+    "main.08247b99.js.map": "/administration-panel/static/js/main.08247b99.js.map"
   },
   "entrypoints": [
-    "static/js/main.1bd5cb4e.js"
+    "static/js/main.08247b99.js"
   ]
 }
