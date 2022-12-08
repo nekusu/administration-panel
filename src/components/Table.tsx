@@ -1,4 +1,4 @@
-import { createStyles, Table as MantineTable } from '@mantine/core';
+import { createStyles, Table as MantineTable, TableProps } from '@mantine/core';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ReactNode } from 'react';
 
@@ -12,9 +12,14 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function Table({ children }: { children: ReactNode }) {
+export default function Table({ children, sx, ...props }: TableProps) {
   return (
-    <MantineTable verticalSpacing="xs" horizontalSpacing="lg" sx={{ position: 'relative' }}>
+    <MantineTable
+      verticalSpacing="xs"
+      horizontalSpacing="lg"
+      {...props}
+      sx={{ position: 'relative', ...sx }}
+    >
       {children}
     </MantineTable>
   );
