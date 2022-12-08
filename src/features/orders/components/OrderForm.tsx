@@ -1,3 +1,5 @@
+import { Button, Group, Loader, Modal, NumberInput, Select, Title } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import dayjs from 'dayjs';
 import { getDoc } from 'firebase/firestore';
 import { addClient, addOrder, editOrder } from 'lib/firebase/utils';
@@ -5,8 +7,6 @@ import { useEffect, useState } from 'react';
 import { RiMoneyDollarCircleLine, RiUserLine } from 'react-icons/ri';
 import { Client } from 'types/client';
 import { Order } from 'types/order';
-import { Button, Group, Loader, Modal, NumberInput, Select, Title } from '@mantine/core';
-import { useForm } from '@mantine/form';
 
 interface OrderFormProps {
   opened: boolean;
@@ -30,7 +30,7 @@ export default function OrderForm({ opened, closeForm, values, clients }: OrderF
     } as InitialValues,
     validate: {
       clientId: (value) => (value ? null : 'Invalid client'),
-      price: (value: number) => {
+      price: (value) => {
         if (value == null) {
           return 'Invalid price';
         }

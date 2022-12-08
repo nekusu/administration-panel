@@ -1,3 +1,18 @@
+import {
+  ActionIcon,
+  Badge,
+  Button,
+  Group,
+  NumberInput,
+  Popover,
+  Text,
+  Title,
+  Tooltip,
+  useMantineTheme,
+} from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { useDisclosure } from '@mantine/hooks';
+import { openConfirmModal } from '@mantine/modals';
 import { Table } from 'components';
 import dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
@@ -14,21 +29,6 @@ import {
   RiUserFollowLine,
 } from 'react-icons/ri';
 import { Order } from 'types/order';
-import {
-  ActionIcon,
-  Badge,
-  Button,
-  Group,
-  NumberInput,
-  Popover,
-  Text,
-  Title,
-  Tooltip,
-  useMantineTheme,
-} from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { useDisclosure } from '@mantine/hooks';
-import { openConfirmModal } from '@mantine/modals';
 
 interface OrderItemProps {
   order: Order;
@@ -59,7 +59,7 @@ export default function OrderItem({
   const form = useForm({
     initialValues: { price: null } as { price: number | null },
     validate: {
-      price: (value: number) => {
+      price: (value) => {
         if (value == null) {
           return 'Invalid price';
         }
