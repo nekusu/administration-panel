@@ -17,8 +17,7 @@
       },
       "nursery": {
         "noBannedTypes": "error",
-        "noConstAssign": "error",
-        "noExplicitAny": "error"
+        "useExhaustiveDependencies": "off"
       }
     }
   },
