@@ -1,14 +1,16 @@
 import { Box, Group } from '@mantine/core';
 import { useDisclosure, useLocalStorage } from '@mantine/hooks';
 import { FloatingButton, MantineProviders, Sidebar, SidePanel } from 'components';
-import Earnings from 'features/earnings';
-import OrdersPage from 'features/orders';
-import StockPage from 'features/stock';
-import StockGroup from 'features/stock-group';
 import { MotionConfig } from 'framer-motion';
 import useBreakpoints from 'lib/mantine/useBreakpoints';
+import { lazy, Suspense } from 'react';
 import { RiLayoutRightLine, RiMenuLine } from 'react-icons/ri';
 import { Stock } from 'types/stock';
+
+const OrdersPage = lazy(() => import('features/orders'));
+const StockPage = lazy(() => import('features/stock'));
+const Earnings = lazy(() => import('features/earnings'));
+const StockGroup = lazy(() => import('features/stock-group'));
 
 export default function App() {
   const isSmallScreen = useBreakpoints({ smallerThan: 'sm' });
@@ -54,14 +56,14 @@ export default function App() {
             onClose={sidebarHandler.close}
           />
           <Box className="modal-container" sx={{ minWidth: 0, position: 'relative', flex: 1 }}>
-            {pages[pageIndex]}
+            <Suspense>{pages[pageIndex]}</Suspense>
           </Box>
           <SidePanel
             opened={visibleSidePanel}
             onClose={() => setVisibleSidePanel(false)}
             title={sidePanelTitles[pageIndex]}
           >
-            {sidePanels[pageIndex]}
+            <Suspense>{sidePanels[pageIndex]}</Suspense>
           </SidePanel>
           {isSmallScreen && (
             <>
