@@ -1,6 +1,7 @@
 {
   "formatter": {
     "ignore": [
+      "build",
       "node_modules"
     ],
     "lineWidth": 100,
@@ -9,6 +10,7 @@
   },
   "linter": {
     "ignore": [
+      "build",
       "node_modules"
     ],
     "rules": {
