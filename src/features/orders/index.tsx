@@ -58,6 +58,12 @@ export default function OrdersPage({ visibleNumbers }: OrdersPageProps) {
 
   useEffect(() => {
     setOrdersLimit(ORDERS_LIMIT);
+    updateFilter({
+      orderBy: ['all', 'pending', 'finished'].includes(filters.status)
+        ? 'receivedTimestamp'
+        : 'deliveredTimestamp',
+      direction: 'desc',
+    });
   }, [filters.status]);
   useEffect(() => {
     if (entry?.isIntersecting && !ordersLoading) {
