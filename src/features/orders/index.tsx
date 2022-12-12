@@ -1,19 +1,21 @@
+import { Button, Group, Loader } from '@mantine/core';
+import { useDisclosure, useIntersection, useLocalStorage } from '@mantine/hooks';
 import { ListManager, Load, MainLayout, Table } from 'components';
-import { orderBy, query, where } from 'firebase/firestore';
+import { limit, orderBy, query, QueryConstraint, where } from 'firebase/firestore';
 import { clientsCollection, ordersCollection } from 'lib/firebase/collections';
 import { addClient } from 'lib/firebase/utils';
 import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { RiAddLine, RiUserSettingsLine } from 'react-icons/ri';
 import { Filters } from 'types/filters';
 import { Order } from 'types/order';
-import { Button } from '@mantine/core';
-import { useDisclosure, useLocalStorage } from '@mantine/hooks';
 import { OrderFilters, OrderForm, OrderItem } from './components';
 
 interface OrdersPageProps {
   visibleNumbers: boolean;
 }
+
+const ORDERS_LIMIT = 20;
 
 export default function OrdersPage({ visibleNumbers }: OrdersPageProps) {
   const clientsQuery = query(clientsCollection, orderBy('name', 'asc'));
@@ -33,7 +35,11 @@ export default function OrdersPage({ visibleNumbers }: OrdersPageProps) {
     setFilters((prevState) => ({ ...prevState, ...value }));
   };
 
-  const ordersQueryConstraints = [orderBy(filters.orderBy, filters.direction)];
+  const [ordersLimit, setOrdersLimit] = useState(ORDERS_LIMIT);
+  const ordersQueryConstraints: QueryConstraint[] = [
+    orderBy(filters.orderBy, filters.direction),
+    limit(ordersLimit),
+  ];
   if (filters.status !== 'all') {
     ordersQueryConstraints.push(where('status', '==', filters.status));
   }
@@ -46,6 +52,18 @@ export default function OrdersPage({ visibleNumbers }: OrdersPageProps) {
   const [orderFormOpened, orderFormHandler] = useDisclosure(false);
   const [clientListOpened, clientListHandler] = useDisclosure(false);
   const [formValues, setFormValues] = useState<Order>();
+
+  const bodyRef = useRef<HTMLDivElement>();
+  const { ref, entry } = useIntersection({ root: bodyRef.current, threshold: 0.5 });
+
+  useEffect(() => {
+    setOrdersLimit(ORDERS_LIMIT);
+  }, [filters.status]);
+  useEffect(() => {
+    if (entry?.isIntersecting && !ordersLoading) {
+      setOrdersLimit((prevState) => prevState + ORDERS_LIMIT);
+    }
+  }, [entry?.isIntersecting]);
 
   return (
     <MainLayout>
@@ -75,7 +93,7 @@ export default function OrdersPage({ visibleNumbers }: OrdersPageProps) {
         filters={<OrderFilters clients={clients} filters={filters} updateFilter={updateFilter} />}
         withNumbersToggle
       />
-      <MainLayout.Body>
+      <MainLayout.Body ref={ref}>
         <OrderForm
           opened={orderFormOpened}
           closeForm={orderFormHandler.close}
@@ -112,6 +130,11 @@ export default function OrdersPage({ visibleNumbers }: OrdersPageProps) {
               ))}
             </Table.Body>
           </Table>
+          {orders?.length === ordersLimit && (
+            <Group ref={ref} pt="xs" pb="lg" position="center">
+              <Loader />
+            </Group>
+          )}
         </Load>
       </MainLayout.Body>
     </MainLayout>

@@ -15,12 +15,12 @@ import {
   Transition,
   useMantineTheme,
 } from '@mantine/core';
-import { useDebouncedValue, useLocalStorage } from '@mantine/hooks';
+import { useDebouncedValue, useLocalStorage, useMergedRef } from '@mantine/hooks';
 import { AnimatePresence, motion } from 'framer-motion';
 import useScroll from 'hooks/useScroll';
 import useBreakpoints from 'lib/mantine/useBreakpoints';
 import useWindowSize from 'lib/mantine/useWindowSize';
-import { ReactNode } from 'react';
+import { forwardRef, ReactNode } from 'react';
 import {
   RiArrowUpLine,
   RiEyeLine,
@@ -157,38 +157,39 @@ function Header({
   );
 }
 
-function Body({ children, sx }: BodyProps) {
+const Body = forwardRef<HTMLDivElement, BodyProps>(function Body({ children, sx }, ref) {
   const theme = useMantineTheme();
   const { scroll, scrollTo, targetRef } = useScroll<HTMLDivElement>();
+  const mergedRef = useMergedRef(ref, targetRef);
 
   return (
-    <Stack ref={targetRef} sx={{ position: 'relative', overflow: 'auto', flex: 1, ...sx }}>
+    <Stack ref={mergedRef} sx={{ position: 'relative', overflow: 'auto', flex: 1, ...sx }}>
       {children}
       <Affix
-        position={{ bottom: 0, left: 0, right: 0 }}
+        position={{ bottom: 0, left: 0 }}
         target={targetRef.current ?? undefined}
         withinPortal={false}
         zIndex={0}
-        sx={{ marginInline: 'auto', position: 'sticky' }}
+        sx={{ position: 'sticky' }}
       >
-        <Transition transition="slide-up" mounted={scroll.y > 100}>
+        <Transition transition="slide-up" mounted={scroll.y > 300}>
           {(styles) => (
-            <Button
-              variant="light"
-              leftIcon={<RiArrowUpLine />}
-              mb="lg"
-              style={styles}
-              onClick={() => scrollTo({ top: 0, behavior: 'smooth' })}
-              sx={{ boxShadow: theme.shadows.md }}
-            >
-              Scroll to top
-            </Button>
+            <Group w="100%" px="lg" pb="lg" position="center" style={styles}>
+              <Button
+                variant="light"
+                leftIcon={<RiArrowUpLine />}
+                onClick={() => scrollTo({ top: 0, behavior: 'smooth' })}
+                sx={{ boxShadow: theme.shadows.md }}
+              >
+                Scroll to top
+              </Button>
+            </Group>
           )}
         </Transition>
       </Affix>
     </Stack>
   );
-}
+});
 
 MainLayout.Header = Header;
 MainLayout.Body = Body;
