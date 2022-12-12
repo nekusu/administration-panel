@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { getDoc } from 'firebase/firestore';
 import { addClient, addOrder, editOrder } from 'lib/firebase/utils';
 import { useEffect, useState } from 'react';
-import { RiMoneyDollarCircleLine, RiUserLine } from 'react-icons/ri';
+import { RiUserLine } from 'react-icons/ri';
 import { Client } from 'types/client';
 import { Order } from 'types/order';
 import { z } from 'zod';
@@ -94,10 +94,14 @@ export default function OrderForm({ opened, closeForm, values, clients }: OrderF
           />
           <NumberInput
             label="Price"
-            icon={<RiMoneyDollarCircleLine />}
+            parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+            formatter={(value) =>
+              !Number.isNaN(+value!) ? `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '$ '
+            }
             placeholder="Pending"
             min={0}
             max={MAX_PRICE}
+            precision={2}
             data-autofocus
             {...form.getInputProps('price')}
           />
