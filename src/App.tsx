@@ -18,6 +18,7 @@ const StockPage = lazy(() => import('features/stock'));
 const ExpensesPage = lazy(() => import('features/expenses'));
 const Earnings = lazy(() => import('features/earnings'));
 const StockGroup = lazy(() => import('features/stock-group'));
+const Summary = lazy(() => import('features/summary'));
 
 const links = [
   { icon: RiBook2Line, label: 'Orders' },
@@ -53,10 +54,11 @@ export default function App() {
     <StockPage activeGroup={activeGroup} setActiveGroup={setActiveGroup} />,
     <ExpensesPage visibleNumbers={visibleNumbers} />,
   ];
-  const sidePanelTitles = ['Earnings', activeGroup?.name];
+  const sidePanelTitles = ['Earnings', activeGroup?.name, 'Summary'];
   const sidePanels = [
     <Earnings visibleNumbers={visibleNumbers} />,
     <StockGroup activeGroup={activeGroup} />,
+    <Summary visibleNumbers={visibleNumbers} />,
   ];
 
   return (

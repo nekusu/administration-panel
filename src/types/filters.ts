@@ -27,4 +27,10 @@ export namespace Filters {
     direction: OrderByDirection;
     tags: string[];
   }
+  export interface Summary {
+    timeframe: 'month' | 'year';
+    showOnly: string[];
+    enableLeftTicks: boolean;
+    enableLabels: boolean;
+  }
 }
