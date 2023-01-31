@@ -86,13 +86,16 @@ export default function Item({ item, activeGroup }: StockItemProps) {
           trapFocus
           opened={colorPopoverOpened}
           onChange={colorPopoverHandler.toggle}
+          withinPortal
         >
           <Popover.Target>
-            <ColorSwatch
-              color={item.color}
-              onClick={colorPopoverHandler.open}
-              sx={{ cursor: 'pointer', zIndex: 0 }}
-            />
+            <Tooltip label="Click to change color" position="right" disabled={colorPopoverOpened}>
+              <ColorSwatch
+                color={item.color}
+                onClick={colorPopoverHandler.open}
+                sx={{ cursor: 'pointer', zIndex: 0 }}
+              />
+            </Tooltip>
           </Popover.Target>
           <Popover.Dropdown>
             <form
@@ -123,7 +126,7 @@ export default function Item({ item, activeGroup }: StockItemProps) {
         />
       </td>
       <td>
-        <Tooltip label="Delete">
+        <Tooltip label="Delete" withinPortal>
           <ActionIcon color="red" onClick={openDeleteModal}>
             <RiDeleteBin7Line />
           </ActionIcon>
