@@ -1,5 +1,5 @@
 import { collection, CollectionReference } from 'firebase/firestore';
-import { Stock } from 'types/stock';
+import * as Stock from 'types/stock';
 import { db } from './app';
 import {
   clientConverter,

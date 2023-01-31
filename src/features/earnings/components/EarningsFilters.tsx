@@ -1,9 +1,9 @@
+import { Box, Checkbox, Collapse, createStyles, Group, MultiSelect, Stack } from '@mantine/core';
+import { DateRangePicker, DateRangePickerValue, getWeekdaysNames } from '@mantine/dates';
 import { LabeledSegmentedControl } from 'components';
 import { Dispatch, SetStateAction } from 'react';
 import { RiCalendar2Line, RiCalendarEventLine } from 'react-icons/ri';
-import { Filters } from 'types/filters';
-import { Box, Checkbox, Collapse, createStyles, Group, MultiSelect, Stack } from '@mantine/core';
-import { DateRangePicker, DateRangePickerValue, getWeekdaysNames } from '@mantine/dates';
+import * as Filters from 'types/filters';
 
 interface EarningsFiltersProps {
   filters: Filters.Earnings;

@@ -11,7 +11,7 @@ import {
   RiLayoutRightLine,
   RiMenuLine,
 } from 'react-icons/ri';
-import { Stock } from 'types/stock';
+import * as Stock from 'types/stock';
 
 const OrdersPage = lazy(() => import('features/orders'));
 const StockPage = lazy(() => import('features/stock'));

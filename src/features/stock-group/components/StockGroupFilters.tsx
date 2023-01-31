@@ -20,8 +20,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { addStockMarker } from 'lib/firebase/utils';
 import { useEffect } from 'react';
 import { RiAddLine, RiBarChart2Line, RiPriceTag3Line } from 'react-icons/ri';
-import { Filters } from 'types/filters';
-import { Stock } from 'types/stock';
+import * as Filters from 'types/filters';
+import * as Stock from 'types/stock';
 import { z } from 'zod';
 import { StockMarker } from './';
 

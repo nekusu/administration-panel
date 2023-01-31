@@ -1,11 +1,11 @@
+import { createStyles, Divider, Group, Paper, Text } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { Fragment } from 'react';
-import { createStyles, Divider, Group, Paper, Text } from '@mantine/core';
 
 interface OverviewProps {
   items: {
     text?: string | number;
-    sub?: string;
+    sub: string;
   }[];
 }
 
@@ -35,7 +35,7 @@ export default function Overview({ items }: OverviewProps) {
     <Paper p="xs" className={classes.container}>
       <Group>
         {items.map(({ text, sub }, index) => (
-          <Fragment key={`${text}${sub}`}>
+          <Fragment key={sub}>
             <motion.div className={classes.item} layout>
               <Text size={26} weight="bold" inline>
                 {text}

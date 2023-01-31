@@ -2,12 +2,12 @@ import {
   FirestoreDataConverter,
   QueryDocumentSnapshot,
   SnapshotOptions,
-  WithFieldValue
+  WithFieldValue,
 } from 'firebase/firestore';
 import { Client } from 'types/client';
 import { Expense, Tag } from 'types/expense';
 import { Order } from 'types/order';
-import { Stock } from 'types/stock';
+import * as Stock from 'types/stock';
 
 export const clientConverter: FirestoreDataConverter<Client> = {
   toFirestore: (data: WithFieldValue<Client>) => data,

@@ -7,8 +7,8 @@ import { addStockGroup } from 'lib/firebase/utils';
 import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
 import { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
 import { RiAddLine, RiFolderSettingsLine } from 'react-icons/ri';
-import { Filters } from 'types/filters';
-import { Stock } from 'types/stock';
+import * as Filters from 'types/filters';
+import * as Stock from 'types/stock';
 import { StockFilters, StockForm, StockItem } from './components';
 
 interface StockPageProps {
@@ -52,7 +52,7 @@ export default function StockPage({ activeGroup, setActiveGroup }: StockPageProp
   const [searchValue, setSearchValue] = useDebouncedState('', 200);
   const filteredItems = useMemo(
     () => stockItems?.filter((item) => item.code.match(new RegExp(searchValue, 'gi'))),
-    [stockItems, searchValue],
+    [stockItems, searchValue]
   );
 
   const [stockFormOpened, stockFormHandler] = useDisclosure(false);

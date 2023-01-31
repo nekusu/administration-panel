@@ -10,7 +10,7 @@ import { orderBy, query, where } from 'firebase/firestore';
 import { expensesCollection, tagsCollection } from 'lib/firebase/collections';
 import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
 import { useMemo, useState } from 'react';
-import { Filters } from 'types/filters';
+import * as Filters from 'types/filters';
 import { BarChart, SummaryFilters } from './components';
 
 interface SummaryProps {

@@ -7,7 +7,7 @@ import { addClient } from 'lib/firebase/utils';
 import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
 import { useEffect, useRef, useState } from 'react';
 import { RiAddLine, RiUserSettingsLine } from 'react-icons/ri';
-import { Filters } from 'types/filters';
+import * as Filters from 'types/filters';
 import { Order } from 'types/order';
 import { OrderFilters, OrderForm, OrderItem } from './components';
 

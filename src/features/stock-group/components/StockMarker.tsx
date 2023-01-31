@@ -1,8 +1,8 @@
+import { Chip, ColorSwatch, Text, Tooltip, useMantineTheme } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { deleteStockMarker } from 'lib/firebase/utils';
-import { Stock } from 'types/stock';
+import * as Stock from 'types/stock';
 import { useLongPress } from 'use-long-press';
-import { Chip, ColorSwatch, Text, Tooltip, useMantineTheme } from '@mantine/core';
 
 interface StockMarkerProps {
   activeGroup?: Stock.Group;
@@ -17,7 +17,7 @@ export default function StockMarker({ activeGroup, marker }: StockMarkerProps) {
         deleteStockMarker(activeGroup.id, marker.id);
       }
     },
-    { threshold: 500 },
+    { threshold: 500 }
   );
 
   const variants = {

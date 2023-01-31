@@ -8,7 +8,7 @@ import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollect
 import { useEffect, useRef, useState } from 'react';
 import { RiAddLine, RiSettings3Line } from 'react-icons/ri';
 import { Expense } from 'types/expense';
-import { Filters } from 'types/filters';
+import * as Filters from 'types/filters';
 import { ExpenseFilters, ExpenseForm, ExpenseItem } from './components';
 
 interface ExpensesPageProps {

@@ -7,8 +7,8 @@ import { stockItemsCollection, stockMarkersCollection } from 'lib/firebase/colle
 import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
 import { useMemo } from 'react';
 import tinycolor from 'tinycolor2';
-import { Filters } from 'types/filters';
-import { Stock } from 'types/stock';
+import * as Filters from 'types/filters';
+import * as Stock from 'types/stock';
 import { BarChart, StockGroupFilters } from './components';
 
 interface StockGroupProps {
@@ -44,11 +44,11 @@ export default function StockGroup({ activeGroup }: StockGroupProps) {
     .filter((marker) => !!marker) as Stock.Marker[];
 
   const { data, keys } = useMemo(() => {
-    let data: BarDatum[] = [];
-    let keys: string[] = [];
+    const data: BarDatum[] = [];
+    const keys: string[] = [];
 
     if (stockItems) {
-      data = [
+      data.push(
         stockItems.reduce((data, stockItem) => {
           data[stockItem.code] = stockItem.quantity;
           data[`${stockItem.code}Color`] = stockItem.color
@@ -56,8 +56,8 @@ export default function StockGroup({ activeGroup }: StockGroupProps) {
             : '';
           keys.push(stockItem.code);
           return data;
-        }, {} as { [index: string]: string | number }),
-      ];
+        }, {} as { [index: string]: string | number })
+      );
     }
 
     return { data, keys };

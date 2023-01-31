@@ -15,7 +15,7 @@ import { addStockGroup, addStockItem } from 'lib/firebase/utils';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { RiFolder3Line, RiHashtag, RiNumbersLine } from 'react-icons/ri';
 import tinycolor from 'tinycolor2';
-import { Stock } from 'types/stock';
+import * as Stock from 'types/stock';
 import { z } from 'zod';
 import { MultiFormatColorInput } from './';
 

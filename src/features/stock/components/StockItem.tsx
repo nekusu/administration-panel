@@ -15,7 +15,7 @@ import { deleteStockItem, editStockItem } from 'lib/firebase/utils';
 import { useEffect, useState } from 'react';
 import { RiCheckLine, RiDeleteBin7Line } from 'react-icons/ri';
 import tinycolor from 'tinycolor2';
-import { Stock } from 'types/stock';
+import * as Stock from 'types/stock';
 import { z } from 'zod';
 import { MultiFormatColorInput } from './';
 

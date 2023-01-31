@@ -1,14 +1,14 @@
+import { Collapse, Stack } from '@mantine/core';
+import { DateRangePickerValue } from '@mantine/dates';
+import { useLocalStorage } from '@mantine/hooks';
+import { Datum } from '@nivo/line';
 import { Load, Overview } from 'components';
 import dayjs, { OpUnitType } from 'dayjs';
 import { query, where } from 'firebase/firestore';
 import { ordersCollection } from 'lib/firebase/collections';
 import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
 import { useMemo, useState } from 'react';
-import { Filters } from 'types/filters';
-import { Collapse, Stack } from '@mantine/core';
-import { DateRangePickerValue } from '@mantine/dates';
-import { useLocalStorage } from '@mantine/hooks';
-import { Datum } from '@nivo/line';
+import * as Filters from 'types/filters';
 import { EarningsFilters, LineChart } from './components';
 
 interface EarningsProps {
@@ -49,7 +49,7 @@ export default function Earnings({ visibleNumbers }: EarningsProps) {
   const { data, timeUnit, totalEarnings, orderCount } = useMemo(() => {
     const { timeframe } = filters;
     const excludedDays = filters.excludedDays.map((day) => +day);
-    let data: Datum[] = [];
+    const data: Datum[] = [];
     let timeUnit: 'day' | 'month' = 'day';
     let totalEarnings = 0;
     let orderCount = 0;

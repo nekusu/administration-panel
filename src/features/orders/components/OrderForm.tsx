@@ -96,7 +96,9 @@ export default function OrderForm({ opened, closeForm, values, clients }: OrderF
             label="Price"
             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
             formatter={(value) =>
-              !Number.isNaN(+value!) ? `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '$ '
+              value && !Number.isNaN(+value)
+                ? `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                : '$ '
             }
             placeholder="Pending"
             min={0}

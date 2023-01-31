@@ -1,7 +1,7 @@
-import { Stock } from 'types/stock';
 import { Box, ColorSwatch, Group, Paper, Text, useMantineTheme } from '@mantine/core';
 import { BarDatum, ResponsiveBar } from '@nivo/bar';
 import { linearGradientDef } from '@nivo/core';
+import * as Stock from 'types/stock';
 
 interface BarChartProps {
   data: BarDatum[];

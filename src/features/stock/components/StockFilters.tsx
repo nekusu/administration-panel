@@ -1,3 +1,4 @@
+import { Group, Text, TextInput } from '@mantine/core';
 import { LabeledSegmentedControl } from 'components';
 import {
   RiArrowDownLine,
@@ -6,8 +7,7 @@ import {
   RiNumbersLine,
   RiSearchLine,
 } from 'react-icons/ri';
-import { Filters } from 'types/filters';
-import { Group, Text, TextInput } from '@mantine/core';
+import * as Filters from 'types/filters';
 
 interface StockFilters {
   setSearchValue(value: string): void;

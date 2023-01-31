@@ -2,7 +2,7 @@ import { addDoc, deleteDoc, doc, DocumentData, updateDoc } from 'firebase/firest
 import { Client } from 'types/client';
 import { Expense, Tag } from 'types/expense';
 import { Order } from 'types/order';
-import { Stock } from 'types/stock';
+import * as Stock from 'types/stock';
 import { db } from './app';
 import {
   clientsCollection,

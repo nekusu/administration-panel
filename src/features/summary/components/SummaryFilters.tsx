@@ -5,7 +5,7 @@ import localeData from 'dayjs/plugin/localeData';
 import { Dispatch, SetStateAction } from 'react';
 import { RiCalendarEventLine, RiPriceTag3Line } from 'react-icons/ri';
 import { Tag } from 'types/expense';
-import { Filters } from 'types/filters';
+import * as Filters from 'types/filters';
 
 interface SummaryFiltersProps {
   filters: Filters.Summary;

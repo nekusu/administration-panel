@@ -1,3 +1,4 @@
+import { Group, MultiSelect, Text } from '@mantine/core';
 import { LabeledSegmentedControl } from 'components';
 import {
   RiArrowDownLine,
@@ -8,8 +9,7 @@ import {
   RiUserSearchLine,
 } from 'react-icons/ri';
 import { Client } from 'types/client';
-import { Filters } from 'types/filters';
-import { Group, MultiSelect, Text } from '@mantine/core';
+import * as Filters from 'types/filters';
 
 interface OrderFiltersProps {
   clients?: Client[];
