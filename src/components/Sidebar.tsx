@@ -1,23 +1,23 @@
+import { Drawer, Navbar, Popover, Stack } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { SidebarButton, ThemePopover } from 'components';
 import useBreakpoints from 'lib/mantine/useBreakpoints';
 import useWindowSize from 'lib/mantine/useWindowSize';
-import { RiArchiveLine, RiBook2Line, RiGithubLine, RiPaletteLine } from 'react-icons/ri';
-import { Drawer, Navbar, Popover, Stack } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { IconType } from 'react-icons/lib';
+import { RiGithubLine, RiPaletteLine } from 'react-icons/ri';
 
 interface SidebarProps {
+  links: {
+    icon: IconType;
+    label: string;
+  }[];
   pageIndex: number;
   setPageIndex(value: number): void;
   opened: boolean;
   onClose(): void;
 }
 
-const links = [
-  { icon: RiBook2Line, label: 'Orders' },
-  { icon: RiArchiveLine, label: 'Stock' },
-];
-
-export default function Sidebar({ pageIndex, setPageIndex, opened, onClose }: SidebarProps) {
+export default function Sidebar({ links, pageIndex, setPageIndex, opened, onClose }: SidebarProps) {
   const isSmallScreen = useBreakpoints({ smallerThan: 'sm' });
   const { height } = useWindowSize();
   const [themePopoverOpened, themePopoverHandler] = useDisclosure(false);

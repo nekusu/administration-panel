@@ -3,10 +3,12 @@ import { Stock } from 'types/stock';
 import { db } from './app';
 import {
   clientConverter,
+  expenseConverter,
   orderConverter,
   stockGroupConverter,
   stockItemConverter,
   stockMarkerConverter,
+  tagConverter,
 } from './converters';
 
 export const clientsCollection = collection(db, 'clients').withConverter(clientConverter);
@@ -22,3 +24,7 @@ export function stockItemsCollection(stockGroupId: string): CollectionReference<
 export function stockMarkersCollection(stockGroupId: string): CollectionReference<Stock.Marker> {
   return collection(db, `groups/${stockGroupId}/markers`).withConverter(stockMarkerConverter);
 }
+
+export const expensesCollection = collection(db, 'expenses').withConverter(expenseConverter);
+
+export const tagsCollection = collection(db, 'tags').withConverter(tagConverter);

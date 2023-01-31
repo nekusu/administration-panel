@@ -22,4 +22,9 @@ export namespace Filters {
     enableLeftTicks: boolean;
     enableLabels: boolean;
   }
+  export interface Expense {
+    orderBy: 'amount' | 'date';
+    direction: OrderByDirection;
+    tags: string[];
+  }
 }

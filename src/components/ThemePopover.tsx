@@ -1,22 +1,18 @@
-import { ReactNode, useEffect } from 'react';
-import { RiCheckLine, RiMoonLine, RiSunLine } from 'react-icons/ri';
 import {
   ColorScheme,
-  ColorSwatch,
   DefaultMantineColor,
   Group,
-  MantineSize,
   Popover,
   SegmentedControl,
-  SimpleGrid,
   Stack,
-  Text,
-  Tooltip,
   useMantineColorScheme,
   useMantineTheme,
 } from '@mantine/core';
 import { FloatingPosition } from '@mantine/core/lib/Floating';
 import { useLocalStorage } from '@mantine/hooks';
+import { ReactNode, useEffect } from 'react';
+import { RiMoonLine, RiSunLine } from 'react-icons/ri';
+import { ColorSelect } from '.';
 
 interface ThemePopoverProps {
   children: ReactNode;
@@ -45,7 +41,7 @@ export default function ThemePopover({ children, position, opened, onChange }: T
             data={[
               {
                 label: (
-                  <Group position="center" spacing="xs">
+                  <Group position='center' spacing='xs'>
                     <RiSunLine /> Light
                   </Group>
                 ),
@@ -53,7 +49,7 @@ export default function ThemePopover({ children, position, opened, onChange }: T
               },
               {
                 label: (
-                  <Group position="center" spacing="xs">
+                  <Group position='center' spacing='xs'>
                     <RiMoonLine /> Dark
                   </Group>
                 ),
@@ -63,21 +59,7 @@ export default function ThemePopover({ children, position, opened, onChange }: T
             value={colorScheme}
             onChange={(value: ColorScheme) => toggleColorScheme(value)}
           />
-          <SimpleGrid cols={Math.ceil(colors.size / 2)} spacing="xs">
-            {[...colors].map((color) => (
-              <Tooltip key={color} label={<Text transform="capitalize">{color}</Text>}>
-                <ColorSwatch
-                  component="button"
-                  color={theme.colors[color][theme.fn.primaryShade()]}
-                  radius={theme.radius[theme.defaultRadius as MantineSize]}
-                  onClick={() => setPrimaryColor(color)}
-                  sx={{ color: 'white', cursor: 'pointer' }}
-                >
-                  {theme.primaryColor === color && <RiCheckLine />}
-                </ColorSwatch>
-              </Tooltip>
-            ))}
-          </SimpleGrid>
+          <ColorSelect value={theme.primaryColor} setValue={setPrimaryColor} />
         </Stack>
       </Popover.Dropdown>
     </Popover>

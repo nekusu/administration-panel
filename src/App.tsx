@@ -4,13 +4,26 @@ import { FloatingButton, MantineProviders, Sidebar, SidePanel } from 'components
 import { MotionConfig } from 'framer-motion';
 import useBreakpoints from 'lib/mantine/useBreakpoints';
 import { lazy, Suspense } from 'react';
-import { RiLayoutRightLine, RiMenuLine } from 'react-icons/ri';
+import {
+  RiArchiveLine,
+  RiBook2Line,
+  RiFundsBoxLine,
+  RiLayoutRightLine,
+  RiMenuLine,
+} from 'react-icons/ri';
 import { Stock } from 'types/stock';
 
 const OrdersPage = lazy(() => import('features/orders'));
 const StockPage = lazy(() => import('features/stock'));
+const ExpensesPage = lazy(() => import('features/expenses'));
 const Earnings = lazy(() => import('features/earnings'));
 const StockGroup = lazy(() => import('features/stock-group'));
+
+const links = [
+  { icon: RiBook2Line, label: 'Orders' },
+  { icon: RiArchiveLine, label: 'Stock' },
+  { icon: RiFundsBoxLine, label: 'Expenses' },
+];
 
 export default function App() {
   const isSmallScreen = useBreakpoints({ smallerThan: 'sm' });
@@ -38,6 +51,7 @@ export default function App() {
   const pages = [
     <OrdersPage visibleNumbers={visibleNumbers} />,
     <StockPage activeGroup={activeGroup} setActiveGroup={setActiveGroup} />,
+    <ExpensesPage visibleNumbers={visibleNumbers} />,
   ];
   const sidePanelTitles = ['Earnings', activeGroup?.name];
   const sidePanels = [
@@ -50,6 +64,7 @@ export default function App() {
       <MotionConfig transition={{ duration: 0.2 }}>
         <Group spacing={0} noWrap>
           <Sidebar
+            links={links}
             pageIndex={pageIndex}
             setPageIndex={setPageIndex}
             opened={sidebarOpened}

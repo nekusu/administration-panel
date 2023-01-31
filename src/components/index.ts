@@ -1,3 +1,4 @@
+export { default as ColorSelect } from './ColorSelect';
 export { default as FloatingButton } from './FloatingButton';
 export { default as LabeledSegmentedControl } from './LabeledSegmentedControl';
 export { default as ListItem } from './ListItem';
@@ -7,6 +8,8 @@ export { default as MainLayout } from './MainLayout';
 export { default as MantineProviders } from './MantineProviders';
 export { default as Overview } from './Overview';
 export { default as QuantityInput } from './QuantityInput';
+export { default as SelectItem } from './SelectItem';
+export { default as SelectValue } from './SelectValue';
 export { default as Sidebar } from './Sidebar';
 export { default as SidebarButton } from './SidebarButton';
 export { default as SidePanel } from './SidePanel';
