@@ -1,8 +1,3 @@
-import { ListItem } from 'components';
-import { motion } from 'framer-motion';
-import useWindowSize from 'lib/mantine/useWindowSize';
-import { useEffect } from 'react';
-import { RiSearchLine, RiUserAddLine } from 'react-icons/ri';
 import {
   ActionIcon,
   Modal,
@@ -15,6 +10,11 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { useInputState } from '@mantine/hooks';
+import { ListItem } from 'components';
+import { motion } from 'framer-motion';
+import useWindowSize from 'lib/mantine/useWindowSize';
+import { useEffect } from 'react';
+import { RiAddLine, RiSearchLine } from 'react-icons/ri';
 
 interface SampleType {
   id: string;
@@ -41,7 +41,7 @@ export default function ListManager<T extends SampleType>({
   const [searchValue, setSearchValue] = useInputState('');
   const filteredClients = items?.filter((item) => item.name.match(new RegExp(searchValue, 'gi')));
   const isExactMatch = !!filteredClients?.find(
-    (item) => item.name.toLowerCase() === searchValue.toLowerCase(),
+    (item) => item.name.toLowerCase() === searchValue.toLowerCase()
   );
 
   useEffect(() => {
@@ -88,7 +88,7 @@ export default function ListManager<T extends SampleType>({
                       setSearchValue('');
                     }}
                   >
-                    <RiUserAddLine />
+                    <RiAddLine />
                   </ActionIcon>
                 </Tooltip>
               </motion.div>
