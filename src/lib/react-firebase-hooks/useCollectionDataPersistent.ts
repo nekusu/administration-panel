@@ -8,20 +8,16 @@ import {
 
 export const useCollectionDataPersistent = <T = DocumentData>(
   query?: Query<T> | null,
-  options?: DataOptions<T> & InitialValueOptions<T[]>,
+  options?: DataOptions<T> & InitialValueOptions<T[]>
 ): CollectionDataHook<T> => {
   const [_values, loading, error, snapshot] = useCollectionData<T>(query, options);
   const [values, setValues] = useState(_values);
 
   useEffect(() => {
-    if (!loading) {
-      setValues(_values ?? []);
-    }
+    if (!loading) setValues(_values ?? []);
   }, [_values, loading]);
   useEffect(() => {
-    if (error) {
-      throw error;
-    }
+    if (error) console.error(error.message);
   }, [error]);
 
   return [values, loading, error, snapshot];
