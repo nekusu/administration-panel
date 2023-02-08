@@ -1,7 +1,16 @@
-import { Box, Checkbox, createStyles, Group, MultiSelect, Select } from '@mantine/core';
+import {
+  Box,
+  Checkbox,
+  createStyles,
+  Group,
+  MantineSize,
+  MultiSelect,
+  Stack,
+  Switch,
+  useMantineTheme,
+} from '@mantine/core';
 import { LabeledSegmentedControl, SelectItem, SelectValue } from 'components';
-import dayjs from 'dayjs';
-import localeData from 'dayjs/plugin/localeData';
+import { DatesRangeValue, DateValue, MonthPickerInput } from 'mantine-dates-6';
 import { Dispatch, SetStateAction } from 'react';
 import { RiCalendarEventLine, RiPriceTag3Line } from 'react-icons/ri';
 import { Tag } from 'types/expense';
@@ -9,90 +18,92 @@ import * as Filters from 'types/filters';
 
 interface SummaryFiltersProps {
   filters: Filters.Summary;
-  updateFilter(value: Partial<Filters.Summary>): void;
+  setFilters(value: Partial<Filters.Summary>): void;
   tags?: Tag[];
-  months: string[];
-  selectedMonth?: string;
-  setSelectedMonth: Dispatch<SetStateAction<string>>;
-  years: string[];
-  selectedYear?: string;
-  setSelectedYear: Dispatch<SetStateAction<string>>;
+  month: DateValue;
+  setMonth: Dispatch<SetStateAction<DateValue>>;
+  range: DatesRangeValue;
+  setRange: (val: DatesRangeValue) => void;
 }
-
-dayjs.extend(localeData);
 
 const useStyles = createStyles((theme) => ({
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
     gap: theme.spacing.sm,
   },
 }));
 
-const TIMEFRAME_UNITS = ['Month', 'Year'];
+const TIMEFRAME_UNITS = ['Month', 'Custom'];
 
 export default function SummaryFilters({
   filters,
-  updateFilter,
+  setFilters,
   tags,
-  months,
-  selectedMonth,
-  setSelectedMonth,
-  years,
-  selectedYear,
-  setSelectedYear,
+  month,
+  setMonth,
+  range,
+  setRange,
 }: SummaryFiltersProps) {
+  const theme = useMantineTheme();
   const { classes } = useStyles();
 
   return (
     <Box className={classes.grid}>
-      <Group spacing="sm" grow>
+      <Stack>
         <LabeledSegmentedControl
           label="Timeframe"
           data={TIMEFRAME_UNITS.map((unit) => ({ label: unit, value: unit.toLowerCase() }))}
           value={filters.timeframe}
-          onChange={(value: Filters.Summary['timeframe']) => updateFilter({ timeframe: value })}
+          onChange={(value: Filters.Summary['timeframe']) => setFilters({ timeframe: value })}
         />
-        <Select
-          label={filters.timeframe === 'month' ? 'Month' : 'Year'}
-          data={
-            filters.timeframe === 'month'
-              ? months.map((month, index) => ({ label: dayjs.months()[index], value: month }))
-              : years
-          }
-          icon={<RiCalendarEventLine />}
-          placeholder={`Select ${filters.timeframe}`}
-          value={filters.timeframe === 'month' ? selectedMonth : selectedYear}
-          onChange={(value) =>
-            (filters.timeframe === 'month' ? setSelectedMonth : setSelectedYear)(value ?? '')
-          }
-          clearable={false}
+        {filters.timeframe === 'month' ? (
+          <MonthPickerInput icon={<RiCalendarEventLine />} value={month} onChange={setMonth} />
+        ) : (
+          <MonthPickerInput
+            type="range"
+            icon={<RiCalendarEventLine />}
+            placeholder="Select range"
+            clearable
+            value={range}
+            onChange={setRange}
+          />
+        )}
+      </Stack>
+      <Stack>
+        <MultiSelect
+          label="Filter by tags"
+          data={tags?.map(({ id, name, color }) => ({ value: id, label: name, color })) ?? []}
+          icon={<RiPriceTag3Line />}
+          placeholder="Select tags"
+          nothingFound="Tag not found"
+          itemComponent={SelectItem}
+          valueComponent={SelectValue}
+          searchable
+          value={filters.tags}
+          onChange={(value) => setFilters({ tags: value })}
         />
-      </Group>
-      <MultiSelect
-        label="Filter by tags"
-        data={tags?.map(({ id, name, color }) => ({ value: id, label: name, color })) ?? []}
-        icon={<RiPriceTag3Line />}
-        placeholder="Select tags"
-        nothingFound="Tag not found"
-        itemComponent={SelectItem}
-        valueComponent={SelectValue}
-        searchable
-        value={filters.showOnly}
-        onChange={(value) => updateFilter({ showOnly: value })}
-      />
-      <Group pt={6}>
-        <Checkbox
-          checked={filters.enableLeftTicks}
-          label="Enable left ticks"
-          onChange={({ target: { checked } }) => updateFilter({ enableLeftTicks: checked })}
+        <Switch
+          label="Only show expenses deducted from funds"
+          checked={filters.showFundsExpenses}
+          onChange={({ target: { checked } }) => setFilters({ showFundsExpenses: checked })}
+          radius={theme.radius[theme.defaultRadius as MantineSize]}
+          mb={-8}
+          styles={{ input: { position: 'absolute' } }}
         />
-        <Checkbox
-          checked={filters.enableLabels}
-          label="Enable labels"
-          onChange={({ target: { checked } }) => updateFilter({ enableLabels: checked })}
-        />
-      </Group>
+        <Group>
+          <Checkbox
+            label="Enable left ticks"
+            checked={filters.enableLeftTicks}
+            onChange={({ target: { checked } }) => setFilters({ enableLeftTicks: checked })}
+          />
+          <Checkbox
+            label="Enable labels"
+            checked={filters.enableLabels}
+            onChange={({ target: { checked } }) => setFilters({ enableLabels: checked })}
+          />
+        </Group>
+      </Stack>
     </Box>
   );
 }

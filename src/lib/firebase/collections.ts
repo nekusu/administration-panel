@@ -3,6 +3,7 @@ import * as Stock from 'types/stock';
 import { db } from './app';
 import {
   clientConverter,
+  depositConverter,
   expenseConverter,
   orderConverter,
   stockGroupConverter,
@@ -28,3 +29,5 @@ export function stockMarkersCollection(stockGroupId: string): CollectionReferenc
 export const expensesCollection = collection(db, 'expenses').withConverter(expenseConverter);
 
 export const tagsCollection = collection(db, 'tags').withConverter(tagConverter);
+
+export const depositsCollection = collection(db, 'deposits').withConverter(depositConverter);

@@ -1,5 +1,6 @@
 import {
   Button,
+  Checkbox,
   DefaultMantineColor,
   Group,
   Loader,
@@ -34,6 +35,7 @@ interface FormValues {
   description: string;
   amount: number;
   date: Date;
+  deductFromFunds: boolean;
 }
 
 const MAX_AMOUNT = 1000000;
@@ -42,11 +44,18 @@ const schema = z.object({
   description: z.string().trim().optional(),
   amount: z.number().min(0).max(MAX_AMOUNT).optional().default(0),
   date: z.date(),
+  deductFromFunds: z.boolean(),
 });
 
 export default function ExpenseForm({ opened, closeForm, values, tags }: ExpenseFormProps) {
   const form = useForm<FormValues>({
-    initialValues: { tagIds: [], description: '', amount: 0, date: new Date() },
+    initialValues: {
+      tagIds: [],
+      description: '',
+      amount: 0,
+      date: new Date(),
+      deductFromFunds: false,
+    },
     validate: zodResolver(schema),
   });
   const [colorTagModalOpened, colorTagModalHandler] = useDisclosure(false);
@@ -160,6 +169,10 @@ export default function ExpenseForm({ opened, closeForm, values, tags }: Expense
               {...form.getInputProps('date')}
             />
           </Group>
+          <Checkbox
+            label="Deduct from funds"
+            {...form.getInputProps('deductFromFunds', { type: 'checkbox' })}
+          />
         </Stack>
         <Group position="right" mt="md">
           <Button type="submit">Confirm</Button>

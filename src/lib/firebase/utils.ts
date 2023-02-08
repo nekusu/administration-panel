@@ -1,11 +1,12 @@
 import { addDoc, deleteDoc, doc, DocumentData, updateDoc } from 'firebase/firestore';
 import { Client } from 'types/client';
-import { Expense, Tag } from 'types/expense';
+import { Deposit, Expense, Tag } from 'types/expense';
 import { Order } from 'types/order';
 import * as Stock from 'types/stock';
 import { db } from './app';
 import {
   clientsCollection,
+  depositsCollection,
   expensesCollection,
   ordersCollection,
   stockGroupsCollection,
@@ -74,4 +75,11 @@ export const deleteExpense = async (id: string) => {
 
 export const addTag = async (tag: Omit<Tag, 'id'>) => {
   return await addDoc(tagsCollection, tag);
+};
+
+export const addDeposit = async (deposit: Omit<Deposit, 'id'>) => {
+  return await addDoc(depositsCollection, deposit);
+};
+export const deleteFund = async (id: string) => {
+  return await deleteDocument('deposits', id);
 };

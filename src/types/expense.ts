@@ -10,4 +10,11 @@ export interface Expense {
   description?: string;
   amount: number;
   date: string;
+  deductFromFunds: boolean;
+}
+
+export interface Deposit {
+  id: string;
+  amount: number;
+  date: string;
 }

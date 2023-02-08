@@ -1,4 +1,13 @@
-import { ActionIcon, Badge, Group, Text, Title, Tooltip, useMantineTheme } from '@mantine/core';
+import {
+  ActionIcon,
+  Badge,
+  Group,
+  Text,
+  ThemeIcon,
+  Title,
+  Tooltip,
+  useMantineTheme,
+} from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { Table } from 'components';
 import dayjs from 'dayjs';
@@ -6,7 +15,7 @@ import calendar from 'dayjs/plugin/calendar';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { deleteExpense } from 'lib/firebase/utils';
 import { Dispatch, SetStateAction } from 'react';
-import { RiDeleteBin7Line, RiPencilLine } from 'react-icons/ri';
+import { RiDeleteBin7Line, RiInformationLine, RiPencilLine } from 'react-icons/ri';
 import { Expense, Tag } from 'types/expense';
 
 interface ExpenseItemProps {
@@ -38,6 +47,7 @@ export default function ExpenseItem({
       centered: true,
       target: '.modal-container',
     });
+  const tooltipEvents = { hover: true, focus: true, touch: true };
 
   return (
     <Table.Row layoutId={expense.id}>
@@ -51,8 +61,17 @@ export default function ExpenseItem({
         </Group>
       </td>
       <td>{expense.description}</td>
-      <td style={{ textAlign: 'right' }}>
-        {visibleNumbers ? `$${expense.amount.toLocaleString()}` : '*****'}
+      <td>
+        <Group position={expense.deductFromFunds ? 'apart' : 'right'} spacing="sm" noWrap>
+          {expense.deductFromFunds && (
+            <Tooltip label="Deducted from funds" events={tooltipEvents} withinPortal>
+              <ThemeIcon variant="light" radius="xl">
+                <RiInformationLine />
+              </ThemeIcon>
+            </Tooltip>
+          )}
+          {visibleNumbers ? `$${expense.amount.toLocaleString()}` : '*****'}
+        </Group>
       </td>
       <td>
         <Text>{dayjs(expense.date).format('L')}</Text>

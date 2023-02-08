@@ -1,9 +1,9 @@
+import { Collapse, createStyles, Drawer, Paper, Title } from '@mantine/core';
+import { useLocalStorage } from '@mantine/hooks';
 import useBreakpoints from 'lib/mantine/useBreakpoints';
 import useWindowSize from 'lib/mantine/useWindowSize';
 import { CSSProperties, ReactNode, useRef } from 'react';
 import { DragSizing } from 'react-drag-sizing';
-import { Collapse, createStyles, Drawer, Paper, Title } from '@mantine/core';
-import { useLocalStorage } from '@mantine/hooks';
 
 export interface SidePanelProps {
   children: ReactNode;
@@ -51,7 +51,7 @@ export default function SidePanel({
   maxWidth = 'min(900px, 45vw)',
   style,
 }: SidePanelProps) {
-  const { classes } = useStyles();
+  const { classes, cx } = useStyles();
   const isLargeScreen = useBreakpoints({ largerThan: 'lg' });
   const { height } = useWindowSize();
   const [width, setWidth] = useLocalStorage({
@@ -72,7 +72,13 @@ export default function SidePanel({
             handlerWidth={12}
             onEnd={() => sidePanelRef.current && setWidth(sidePanelRef.current.offsetWidth)}
           >
-            <Paper ref={sidePanelRef} className={classes.container} h={height} p="lg" withBorder>
+            <Paper
+              ref={sidePanelRef}
+              className={cx(classes.container, 'side-panel')}
+              h={height}
+              p="lg"
+              withBorder
+            >
               <Title order={1} mb="md">
                 {title}
               </Title>
@@ -82,6 +88,7 @@ export default function SidePanel({
         </Collapse>
       ) : (
         <Drawer
+          classNames={{ drawer: 'side-panel' }}
           position="right"
           title={<Title order={1}>{title}</Title>}
           padding="lg"

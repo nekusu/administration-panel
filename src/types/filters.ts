@@ -27,8 +27,9 @@ export interface Expense {
   tags: string[];
 }
 export interface Summary {
-  timeframe: 'month' | 'year';
-  showOnly: string[];
+  timeframe: 'month' | 'custom';
+  tags: string[];
+  showFundsExpenses: boolean;
   enableLeftTicks: boolean;
   enableLabels: boolean;
 }

@@ -5,7 +5,7 @@ import {
   WithFieldValue,
 } from 'firebase/firestore';
 import { Client } from 'types/client';
-import { Expense, Tag } from 'types/expense';
+import { Deposit, Expense, Tag } from 'types/expense';
 import { Order } from 'types/order';
 import * as Stock from 'types/stock';
 
@@ -59,8 +59,8 @@ export const stockMarkerConverter: FirestoreDataConverter<Stock.Marker> = {
 export const expenseConverter: FirestoreDataConverter<Expense> = {
   toFirestore: (data: WithFieldValue<Expense>) => data,
   fromFirestore(snapshot: QueryDocumentSnapshot<Expense>, options: SnapshotOptions): Expense {
-    const { tagIds, description, amount, date } = snapshot.data(options);
-    return { id: snapshot.id, tagIds, description, amount, date };
+    const { tagIds, description, amount, date, deductFromFunds } = snapshot.data(options);
+    return { id: snapshot.id, tagIds, description, amount, date, deductFromFunds };
   },
 };
 
@@ -69,5 +69,13 @@ export const tagConverter: FirestoreDataConverter<Tag> = {
   fromFirestore(snapshot: QueryDocumentSnapshot<Tag>, options: SnapshotOptions): Tag {
     const { name, color } = snapshot.data(options);
     return { id: snapshot.id, name, color };
+  },
+};
+
+export const depositConverter: FirestoreDataConverter<Deposit> = {
+  toFirestore: (data: WithFieldValue<Deposit>) => data,
+  fromFirestore(snapshot: QueryDocumentSnapshot<Deposit>, options: SnapshotOptions): Deposit {
+    const { amount, date } = snapshot.data(options);
+    return { id: snapshot.id, amount, date };
   },
 };

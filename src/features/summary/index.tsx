@@ -1,123 +1,107 @@
-import { Collapse, Stack } from '@mantine/core';
-import { useLocalStorage } from '@mantine/hooks';
-import { BarDatum } from '@nivo/bar';
+import {
+  ActionIcon,
+  Button,
+  Collapse,
+  Group,
+  Stack,
+  Tooltip,
+  useMantineTheme,
+} from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { Load, Overview } from 'components';
-import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import localeData from 'dayjs/plugin/localeData';
-import { orderBy, query, where } from 'firebase/firestore';
-import { expensesCollection, tagsCollection } from 'lib/firebase/collections';
+import { orderBy, query } from 'firebase/firestore';
+import { tagsCollection } from 'lib/firebase/collections';
 import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
-import { useMemo, useState } from 'react';
-import * as Filters from 'types/filters';
-import { BarChart, SummaryFilters } from './components';
+import { DatesRangeValue, DateValue } from 'mantine-dates-6';
+import { useState } from 'react';
+import { RiHistoryLine, RiInboxArchiveLine } from 'react-icons/ri';
+import { BarChart, DepositForm, DepositHistory, SummaryFilters } from './components';
+import useChartData from './hooks/useChartData';
+import useDeposits from './hooks/useDeposits';
+import useExpenses from './hooks/useExpenses';
+import useFilters from './hooks/useFilters';
 
 interface SummaryProps {
   visibleNumbers: boolean;
 }
 
-dayjs.extend(customParseFormat);
-dayjs.extend(localeData);
-dayjs.extend(isSameOrBefore);
-
-const months = dayjs.monthsShort().filter((month) => dayjs(month, 'MMM').isSameOrBefore(dayjs()));
-
 export default function Summary({ visibleNumbers }: SummaryProps) {
-  const tagsQuery = query(tagsCollection, orderBy('name', 'asc'));
-  const [tags] = useCollectionDataPersistent(tagsQuery);
-
-  const [filters, setFilters] = useLocalStorage<Filters.Summary>({
-    key: 'summary-filters',
-    defaultValue: {
-      timeframe: 'year',
-      showOnly: [],
-      enableLeftTicks: true,
-      enableLabels: true,
-    },
-    getInitialValueInEffect: false,
-  });
-  const updateFilter = (value: Partial<Filters.Summary>) => {
-    setFilters((prevState) => ({ ...prevState, ...value }));
-  };
-
-  const [selectedMonth, setSelectedMonth] = useState(dayjs().format('MMM'));
-  const [selectedYear, setSelectedYear] = useState(dayjs().format('YYYY'));
-
-  const expensesQueryConstraints = [];
-  if (filters.showOnly.length) {
-    expensesQueryConstraints.push(where('tagIds', 'array-contains-any', filters.showOnly));
-  }
-  const expensesQuery = query(expensesCollection, ...expensesQueryConstraints);
-  const [expenses] = useCollectionDataPersistent(expensesQuery);
-
-  const { data, keys, totalExpenses, years } = useMemo(() => {
-    const data: BarDatum[] = [];
-    const keys = new Set<string>();
-    const years = new Set<string>();
-    let totalExpenses = 0;
-
-    if (tags && expenses) {
-      for (const month of months) {
-        const item: BarDatum = { month };
-        for (const tag of tags) {
-          let tagAmount = 0;
-          for (const expense of expenses) {
-            if (expense.tagIds.includes(tag.id) && dayjs(expense.date).format('MMM') === month) {
-              tagAmount += expense.amount;
-            }
-          }
-
-          if ((!filters.showOnly.length || filters.showOnly.includes(tag.id)) && tagAmount) {
-            item[tag.name] = tagAmount;
-            item[`${tag.name}Color`] = tag.color;
-            keys.add(tag.name);
-          }
-        }
-        data.push(item);
-      }
-      expenses.forEach((expense) => {
-        years.add(dayjs(expense.date).format('YYYY'));
-        totalExpenses += expense.amount;
-      });
-    }
-
-    return { data, keys, totalExpenses, years };
-  }, [tags, expenses]);
+  const theme = useMantineTheme();
+  const [filters, setFilters] = useFilters();
+  const [month, setMonth] = useState<DateValue>(new Date());
+  const [range, setRange] = useState<DatesRangeValue>([null, null]);
+  const dates = filters.timeframe === 'month' ? ([month, month] as DatesRangeValue) : range;
+  const [tags] = useCollectionDataPersistent(query(tagsCollection, orderBy('name', 'asc')));
+  const { expenses, total } = useExpenses(dates, filters);
+  const { deposits, deposited, remainingFunds } = useDeposits(dates);
+  const chartData = useChartData(dates, filters.tags, tags, expenses, deposits);
+  const [depositFormOpened, depositFormHandler] = useDisclosure(false);
+  const [depositHistoryOpened, depositHistoryHandler] = useDisclosure(false);
 
   return (
     <Stack>
-      <Load in={!!expenses && !!tags} style={{ minHeight: 336 }}>
+      <Load in={!!(tags && expenses && deposits)} style={{ minHeight: 336 }}>
         <Stack spacing={0}>
           <Overview
             items={[
               {
-                text: visibleNumbers ? `$${totalExpenses.toLocaleString()}` : '*****',
-                sub: 'Total',
+                text: visibleNumbers ? `$${total.toLocaleString()}` : '*****',
+                sub: 'Expenses',
+              },
+              {
+                text: visibleNumbers ? `$${deposited.toLocaleString()}` : '*****',
+                sub: 'Deposited',
+              },
+              {
+                text: visibleNumbers ? `$${remainingFunds.toLocaleString()}` : '*****',
+                sub: 'Remaining funds',
               },
             ]}
           />
-          <Collapse in={visibleNumbers && !!tags?.length && !!expenses?.length}>
+          <Collapse in={visibleNumbers && dates.every((date) => !!date)}>
             <BarChart
-              data={data}
-              keys={[...keys]}
               timeframe={filters.timeframe}
               enableLeftTicks={filters.enableLeftTicks}
               enableLabels={filters.enableLabels}
+              {...chartData}
             />
           </Collapse>
         </Stack>
       </Load>
+      <Group position="apart">
+        <Group spacing={6}>
+          <Button
+            variant="light"
+            leftIcon={<RiInboxArchiveLine />}
+            onClick={depositFormHandler.open}
+          >
+            Deposit
+          </Button>
+        </Group>
+        <Tooltip label="Deposit history">
+          <ActionIcon
+            variant="subtle"
+            color={theme.primaryColor}
+            onClick={depositHistoryHandler.open}
+          >
+            <RiHistoryLine />
+          </ActionIcon>
+        </Tooltip>
+      </Group>
+      <DepositForm opened={depositFormOpened} close={depositFormHandler.close} />
+      <DepositHistory
+        opened={depositHistoryOpened}
+        close={depositHistoryHandler.close}
+        deposits={deposits}
+      />
       <SummaryFilters
         filters={filters}
-        updateFilter={updateFilter}
+        setFilters={setFilters}
         tags={tags}
-        months={months}
-        selectedMonth={selectedMonth}
-        setSelectedMonth={setSelectedMonth}
-        years={[...years]}
-        selectedYear={selectedYear}
-        setSelectedYear={setSelectedYear}
+        month={month}
+        setMonth={setMonth}
+        range={range}
+        setRange={setRange}
       />
     </Stack>
   );

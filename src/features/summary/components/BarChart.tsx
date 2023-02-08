@@ -1,11 +1,12 @@
 import { Box, ColorSwatch, Group, Paper, Text, useMantineTheme } from '@mantine/core';
 import { BarDatum, ResponsiveBar } from '@nivo/bar';
 import { linearGradientDef } from '@nivo/core';
+import * as Filters from 'types/filters';
 
 interface BarChartProps {
   data: BarDatum[];
   keys: string[];
-  timeframe: 'month' | 'year';
+  timeframe: Filters.Summary['timeframe'];
   height?: number;
   enableLeftTicks: boolean;
   enableLabels: boolean;
@@ -29,25 +30,25 @@ export default function BarChart({
           keys={keys}
           margin={{
             top: 6,
-            bottom: timeframe === 'year' ? 28 : 6,
+            bottom: timeframe === 'month' ? 6 : 28,
             left: enableLeftTicks ? 44 : 0,
           }}
           valueScale={{ type: 'linear' }}
           indexScale={{ type: 'band' }}
           axisLeft={{ tickValues: 3 }}
           axisBottom={
-            timeframe === 'year'
-              ? {
+            timeframe === 'month'
+              ? null
+              : {
                   tickSize: 5,
                   tickPadding: 5,
                   tickRotation: 0,
                   legendPosition: 'middle',
                   legendOffset: 32,
                 }
-              : null
           }
           indexBy="month"
-          groupMode={timeframe === 'year' ? 'stacked' : 'grouped'}
+          groupMode={data.length <= 6 ? 'grouped' : 'stacked'}
           defs={[
             linearGradientDef('gradient', [
               { offset: 0, color: 'inherit' },
@@ -97,7 +98,7 @@ export default function BarChart({
               ? theme.fn.lighten(color, 0.25)
               : theme.fn.darken(color, 0.25)
           }
-          padding={enableLeftTicks ? 0.4 / keys.length : 0}
+          padding={0.4 / keys.length}
           borderRadius={4}
           enableGridY={false}
           motionConfig="default"
