@@ -1,1 +1,0 @@
-import{j as s,G as i,aj as t}from"./index-5ff1983a.js";import{B as o}from"./Badge-f1b67808.js";function x({label:r,color:a,onRemove:e,classNames:p,...n}){return s.jsx("div",{...n,children:s.jsx(o,{color:a,radius:"sm",pr:4,children:s.jsxs(i,{spacing:4,noWrap:!0,children:[r,s.jsx(t,{onClick:e,variant:"transparent",color:a,size:14,iconSize:14,tabIndex:-1})]})})})}export{x as S};
