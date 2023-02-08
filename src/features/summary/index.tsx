@@ -15,7 +15,7 @@ import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollect
 import { DatesRangeValue, DateValue } from 'mantine-dates-6';
 import { useState } from 'react';
 import { RiHistoryLine, RiInboxArchiveLine } from 'react-icons/ri';
-import { BarChart, DepositForm, DepositHistory, SummaryFilters } from './components';
+import { BarChart, DepositForm, DepositHistory, NetEarnings, SummaryFilters } from './components';
 import useChartData from './hooks/useChartData';
 import useDeposits from './hooks/useDeposits';
 import useExpenses from './hooks/useExpenses';
@@ -37,6 +37,7 @@ export default function Summary({ visibleNumbers }: SummaryProps) {
   const chartData = useChartData(dates, filters.tags, tags, expenses, deposits);
   const [depositFormOpened, depositFormHandler] = useDisclosure(false);
   const [depositHistoryOpened, depositHistoryHandler] = useDisclosure(false);
+  const [netEarningsOpened, netEarningsHandler] = useDisclosure(false);
 
   return (
     <Stack>
@@ -77,6 +78,9 @@ export default function Summary({ visibleNumbers }: SummaryProps) {
           >
             Deposit
           </Button>
+          <Button variant="subtle" onClick={netEarningsHandler.open}>
+            Net earnings
+          </Button>
         </Group>
         <Tooltip label="Deposit history">
           <ActionIcon
@@ -89,6 +93,7 @@ export default function Summary({ visibleNumbers }: SummaryProps) {
         </Tooltip>
       </Group>
       <DepositForm opened={depositFormOpened} close={depositFormHandler.close} />
+      <NetEarnings opened={netEarningsOpened} close={netEarningsHandler.close} />
       <DepositHistory
         opened={depositHistoryOpened}
         close={depositHistoryHandler.close}
