@@ -44,35 +44,38 @@ export default function EarningsFilters({
             icon={<RiCalendar2Line />}
             placeholder="Select dates range"
             firstDayOfWeek="sunday"
+            initialLevel="month"
             pt="md"
             value={dateRange}
             onChange={setDateRange}
           />
         </Collapse>
       </Stack>
-      <MultiSelect
-        label="Exclude"
-        data={getWeekdaysNames('en', 'sunday', 'dddd').map((day, index) => ({
-          label: day,
-          value: index.toString(),
-        }))}
-        icon={<RiCalendarEventLine />}
-        placeholder="Select days"
-        value={filters.excludedDays}
-        onChange={(value) => updateFilter({ excludedDays: value })}
-      />
-      <Group pt={6}>
-        <Checkbox
-          checked={filters.enableLeftTicks}
-          label="Enable left ticks"
-          onChange={({ target: { checked } }) => updateFilter({ enableLeftTicks: checked })}
+      <Stack>
+        <MultiSelect
+          label="Exclude"
+          data={getWeekdaysNames('en', 'sunday', 'dddd').map((day, index) => ({
+            label: day,
+            value: index.toString(),
+          }))}
+          icon={<RiCalendarEventLine />}
+          placeholder="Select days"
+          value={filters.excludedDays}
+          onChange={(value) => updateFilter({ excludedDays: value })}
         />
-        <Checkbox
-          checked={filters.enableBottomTicks}
-          label="Enable bottom ticks"
-          onChange={({ target: { checked } }) => updateFilter({ enableBottomTicks: checked })}
-        />
-      </Group>
+        <Group>
+          <Checkbox
+            checked={filters.enableLeftTicks}
+            label="Enable left ticks"
+            onChange={({ target: { checked } }) => updateFilter({ enableLeftTicks: checked })}
+          />
+          <Checkbox
+            checked={filters.enableBottomTicks}
+            label="Enable bottom ticks"
+            onChange={({ target: { checked } }) => updateFilter({ enableBottomTicks: checked })}
+          />
+        </Group>
+      </Stack>
     </Box>
   );
 }
