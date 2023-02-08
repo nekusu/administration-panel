@@ -5,6 +5,15 @@ export interface Order {
   orderBy: 'price' | 'receivedTimestamp' | 'deliveredTimestamp';
   direction: OrderByDirection;
   clients: string[];
+  lastValues: Partial<
+    Record<
+      'all' | 'pending' | 'finished' | 'delivered',
+      {
+        orderBy: 'price' | 'receivedTimestamp' | 'deliveredTimestamp';
+        direction: OrderByDirection;
+      }
+    >
+  >;
 }
 export interface Earnings {
   timeframe: 'week' | 'month' | 'year' | 'custom';

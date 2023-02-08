@@ -14,10 +14,10 @@ import * as Filters from 'types/filters';
 interface OrderFiltersProps {
   clients?: Client[];
   filters: Filters.Order;
-  updateFilter(value: Partial<Filters.Order>): void;
+  setFilters(value: Partial<Filters.Order>): void;
 }
 
-export default function OrderFilters({ clients, filters, updateFilter }: OrderFiltersProps) {
+export default function OrderFilters({ clients, filters, setFilters }: OrderFiltersProps) {
   return (
     <>
       <LabeledSegmentedControl
@@ -29,7 +29,7 @@ export default function OrderFilters({ clients, filters, updateFilter }: OrderFi
           { label: 'Delivered', value: 'delivered' },
         ]}
         value={filters.status}
-        onChange={(value: Filters.Order['status']) => updateFilter({ status: value })}
+        onChange={(value: Filters.Order['status']) => setFilters({ status: value })}
       />
       <LabeledSegmentedControl
         label="Order by"
@@ -63,7 +63,7 @@ export default function OrderFilters({ clients, filters, updateFilter }: OrderFi
           },
         ]}
         value={filters.orderBy}
-        onChange={(value: Filters.Order['orderBy']) => updateFilter({ orderBy: value })}
+        onChange={(value: Filters.Order['orderBy']) => setFilters({ orderBy: value })}
       />
       <LabeledSegmentedControl
         label="Direction"
@@ -88,7 +88,7 @@ export default function OrderFilters({ clients, filters, updateFilter }: OrderFi
           },
         ]}
         value={filters.direction}
-        onChange={(value: Filters.Order['direction']) => updateFilter({ direction: value })}
+        onChange={(value: Filters.Order['direction']) => setFilters({ direction: value })}
       />
       <MultiSelect
         label="Filter by clients"
@@ -99,7 +99,7 @@ export default function OrderFilters({ clients, filters, updateFilter }: OrderFi
         maxLength={36}
         searchable
         value={filters.clients}
-        onChange={(value) => updateFilter({ clients: value })}
+        onChange={(value) => setFilters({ clients: value })}
       />
     </>
   );
