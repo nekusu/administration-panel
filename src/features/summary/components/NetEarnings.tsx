@@ -31,7 +31,11 @@ export default function NetEarnings({ opened, close }: NetEarningsProps) {
   ];
   const ordersQuery = query(ordersCollection, ...ordersQueryConstraints);
   const [orders, ordersLoading] = useCollectionDataPersistent(ordersQuery);
-  const totalExpenses = expenses?.reduce((total, expense) => total + expense.amount, 0) ?? 0;
+  const totalExpenses =
+    expenses?.reduce((total, expense) => {
+      if (!expense.deductFromFunds) total += expense.amount;
+      return total;
+    }, 0) ?? 0;
   const totalDeposits = deposits?.reduce((total, deposit) => total + deposit.amount, 0) ?? 0;
   const totalEarnings = orders?.reduce((total, order) => total + order.price, 0) ?? 0;
 
