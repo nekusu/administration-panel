@@ -1,5 +1,6 @@
-import { Collapse, createStyles, Drawer, Paper, Title } from '@mantine/core';
+import { createStyles, Drawer, Paper, Title } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
+import { motion } from 'framer-motion';
 import useBreakpoints from 'lib/mantine/useBreakpoints';
 import useWindowSize from 'lib/mantine/useWindowSize';
 import { CSSProperties, ReactNode, useRef } from 'react';
@@ -60,11 +61,19 @@ export default function SidePanel({
     getInitialValueInEffect: false,
   });
   const sidePanelRef = useRef<HTMLDivElement>(null);
+  const isVisible = !!title && opened;
 
   return (
     <>
       {isLargeScreen ? (
-        <Collapse in={!!title && opened} axis="x">
+        <motion.div
+          animate={{
+            opacity: isVisible ? 1 : 0,
+            width: isVisible ? 'auto' : 0,
+            overflow: 'hidden',
+            transitionEnd: { overflow: isVisible ? 'visible' : 'hidden' },
+          }}
+        >
           <DragSizing
             border="left"
             style={{ width, minWidth, maxWidth, ...style }}
@@ -85,7 +94,7 @@ export default function SidePanel({
               {children}
             </Paper>
           </DragSizing>
-        </Collapse>
+        </motion.div>
       ) : (
         <Drawer
           classNames={{ drawer: 'side-panel' }}
