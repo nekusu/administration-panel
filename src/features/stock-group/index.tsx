@@ -1,10 +1,8 @@
 import { Collapse, Stack } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { BarDatum } from '@nivo/bar';
+import { useCollection } from '@tatsuokaniwa/swr-firestore';
 import { Load, Overview } from 'components';
-import { orderBy, query } from 'firebase/firestore';
-import { stockItemsCollection, stockMarkersCollection } from 'lib/firebase/collections';
-import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
 import { useMemo } from 'react';
 import tinycolor from 'tinycolor2';
 import * as Filters from 'types/filters';
@@ -29,27 +27,24 @@ export default function StockGroup({ activeGroup }: StockGroupProps) {
     setFilters((prevState) => ({ ...prevState, ...value }));
   };
 
-  const stockItemsQuery = activeGroup
-    ? query(stockItemsCollection(activeGroup.id), orderBy('code', 'asc'))
-    : null;
-  const [stockItems] = useCollectionDataPersistent(stockItemsQuery);
-
-  const stockMarkersQuery = activeGroup
-    ? query(stockMarkersCollection(activeGroup.id), orderBy('value', 'desc'))
-    : null;
-  const [stockMarkers] = useCollectionDataPersistent(stockMarkersQuery);
+  const { data: items } = useCollection<Stock.Item>(
+    activeGroup ? { path: `groups/${activeGroup.id}/items`, orderBy: [['code', 'asc']] } : null
+  );
+  const { data: markers } = useCollection<Stock.Marker>(
+    activeGroup ? { path: `groups/${activeGroup.id}/markers`, orderBy: [['value', 'desc']] } : null
+  );
 
   const enabledMarkers = filters.enabledMarkers
-    .map((id) => stockMarkers?.find((marker) => marker.id === id))
+    .map((id) => markers?.find((marker) => marker.id === id))
     .filter((marker) => !!marker) as Stock.Marker[];
 
   const { data, keys } = useMemo(() => {
     const data: BarDatum[] = [];
     const keys: string[] = [];
 
-    if (stockItems) {
+    if (items) {
       data.push(
-        stockItems.reduce((data, stockItem) => {
+        items.reduce((data, stockItem) => {
           data[stockItem.code] = stockItem.quantity;
           data[`${stockItem.code}Color`] = stockItem.color
             ? tinycolor(stockItem.color).toHexString()
@@ -61,28 +56,28 @@ export default function StockGroup({ activeGroup }: StockGroupProps) {
     }
 
     return { data, keys };
-  }, [stockItems]);
+  }, [items]);
   const overviewItems = useMemo(() => {
-    const items: { text: number; sub: string }[] = [];
+    const overviewItems: { text: number; sub: string }[] = [];
 
-    if (stockItems && stockMarkers) {
+    if (items && markers) {
       enabledMarkers.forEach(({ name, value }) => {
-        items.push({
-          text: stockItems.filter(({ quantity }) => quantity < value).length,
+        overviewItems.push({
+          text: items.filter(({ quantity }) => quantity < value).length,
           sub: name,
         });
       });
     }
 
-    return items.sort((a, b) => b.text - a.text);
-  }, [filters.enabledMarkers, stockItems, stockMarkers]);
+    return overviewItems.sort((a, b) => b.text - a.text);
+  }, [filters.enabledMarkers, items, markers]);
 
   return (
     <Stack>
-      <Load in={!!stockItems} style={{ minHeight: 336 }}>
+      <Load in={!!items} style={{ minHeight: 336 }}>
         <Stack spacing={0}>
-          <Overview items={[{ text: stockItems?.length, sub: 'Items' }, ...overviewItems]} />
-          <Collapse in={!!stockItems?.length}>
+          <Overview items={[{ text: items?.length, sub: 'Items' }, ...overviewItems]} />
+          <Collapse in={!!items?.length}>
             <BarChart
               data={data}
               keys={keys}
@@ -94,7 +89,7 @@ export default function StockGroup({ activeGroup }: StockGroupProps) {
         </Stack>
       </Load>
       <StockGroupFilters
-        markers={stockMarkers}
+        markers={markers}
         activeGroup={activeGroup}
         filters={filters}
         updateFilter={updateFilter}

@@ -2,13 +2,13 @@ import { Collapse, Stack } from '@mantine/core';
 import { DatesRangeValue } from '@mantine/dates';
 import { useLocalStorage } from '@mantine/hooks';
 import { Datum } from '@nivo/line';
+import { useCollection } from '@tatsuokaniwa/swr-firestore';
 import { Load, Overview } from 'components';
 import dayjs, { OpUnitType } from 'dayjs';
-import { query, where } from 'firebase/firestore';
-import { ordersCollection } from 'lib/firebase/collections';
-import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
+import { QueryConstraint, where } from 'firebase/firestore';
 import { useMemo, useState } from 'react';
 import * as Filters from 'types/filters';
+import { Order } from 'types/order';
 import { EarningsFilters, LineChart } from './components';
 
 interface EarningsProps {
@@ -36,15 +36,14 @@ export default function Earnings({ visibleNumbers }: EarningsProps) {
       ? dateRange.map((date) => dayjs(date))
       : [dayjs().startOf(filters.timeframe as OpUnitType), dayjs()];
 
-  const ordersQueryConstraints = [
+  const queryConstraints: QueryConstraint[] = [
     where('status', '==', 'delivered'),
     where('deliveredTimestamp', '>=', startTime.valueOf()),
   ];
   if (filters.timeframe === 'custom') {
-    ordersQueryConstraints.push(where('deliveredTimestamp', '<=', endTime.endOf('day').valueOf()));
+    queryConstraints.push(where('deliveredTimestamp', '<=', endTime.endOf('day').valueOf()));
   }
-  const ordersQuery = query(ordersCollection, ...ordersQueryConstraints);
-  const [orders] = useCollectionDataPersistent(ordersQuery);
+  const { data: orders } = useCollection<Order>({ path: 'orders', queryConstraints });
 
   const { data, timeUnit, totalEarnings, orderCount } = useMemo(() => {
     const { timeframe } = filters;

@@ -1,12 +1,12 @@
 import { Button, Group, Loader } from '@mantine/core';
 import { useDisclosure, useIntersection } from '@mantine/hooks';
+import { useCollection } from '@tatsuokaniwa/swr-firestore';
 import { ListManager, Load, MainLayout, Table } from 'components';
-import { limit, orderBy, query, QueryConstraint, where } from 'firebase/firestore';
-import { clientsCollection, ordersCollection } from 'lib/firebase/collections';
+import { QueryConstraint, limit, orderBy, where } from 'firebase/firestore';
 import { addClient } from 'lib/firebase/utils';
-import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
 import { useEffect, useRef, useState } from 'react';
 import { RiAddLine, RiUserSettingsLine } from 'react-icons/ri';
+import { Client } from 'types/client';
 import { Order } from 'types/order';
 import { OrderFilters, OrderForm, OrderItem } from './components';
 import useFilters from './hooks/useFilters';
@@ -19,21 +19,20 @@ const ORDERS_LIMIT = 20;
 
 export default function OrdersPage({ visibleNumbers }: OrdersPageProps) {
   const [filters, setFilters] = useFilters();
-  const clientsQuery = query(clientsCollection, orderBy('name', 'asc'));
-  const [clients, clientsLoading] = useCollectionDataPersistent(clientsQuery);
+  const { data: clients } = useCollection<Client>({ path: 'clients', orderBy: [['name', 'asc']] });
   const [ordersLimit, setOrdersLimit] = useState(ORDERS_LIMIT);
-  const ordersQueryConstraints: QueryConstraint[] = [
+
+  const queryConstraints: QueryConstraint[] = [
     orderBy(filters.orderBy, filters.direction),
     limit(ordersLimit),
   ];
   if (filters.status !== 'all') {
-    ordersQueryConstraints.push(where('status', '==', filters.status));
+    queryConstraints.push(where('status', '==', filters.status));
   }
   if (filters.clients.length) {
-    ordersQueryConstraints.push(where('clientId', 'in', filters.clients));
+    queryConstraints.push(where('clientId', 'in', filters.clients));
   }
-  const ordersQuery = query(ordersCollection, ...ordersQueryConstraints);
-  const [orders, ordersLoading] = useCollectionDataPersistent(ordersQuery);
+  const { data: orders } = useCollection<Order>({ path: 'orders', queryConstraints });
 
   const [orderFormOpened, orderFormHandler] = useDisclosure(false);
   const [clientListOpened, clientListHandler] = useDisclosure(false);
@@ -46,7 +45,7 @@ export default function OrdersPage({ visibleNumbers }: OrdersPageProps) {
     setOrdersLimit(ORDERS_LIMIT);
   }, [filters.status]);
   useEffect(() => {
-    if (entry?.isIntersecting && !ordersLoading) {
+    if (entry?.isIntersecting && !!orders) {
       setOrdersLimit((prevState) => prevState + ORDERS_LIMIT);
     }
   }, [entry?.isIntersecting]);
@@ -55,7 +54,7 @@ export default function OrdersPage({ visibleNumbers }: OrdersPageProps) {
     <MainLayout>
       <MainLayout.Header
         title="Orders"
-        loading={clientsLoading || ordersLoading}
+        loading={!clients || !orders}
         buttons={
           <>
             <Button

@@ -1,12 +1,13 @@
 import { Divider, Group, Modal, Paper, Stack, Text, useMantineTheme } from '@mantine/core';
 import { DateValue, MonthPickerInput } from '@mantine/dates';
+import { useCollection } from '@tatsuokaniwa/swr-firestore';
 import { Load } from 'components';
 import dayjs from 'dayjs';
-import { query, where } from 'firebase/firestore';
-import { depositsCollection, expensesCollection, ordersCollection } from 'lib/firebase/collections';
-import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
+import { where } from 'firebase/firestore';
 import { useState } from 'react';
 import { RiCalendarEventLine } from 'react-icons/ri';
+import { Deposit, Expense } from 'types/expense';
+import { Order } from 'types/order';
 
 interface NetEarningsProps {
   opened: boolean;
@@ -16,21 +17,20 @@ interface NetEarningsProps {
 export default function NetEarnings({ opened, close }: NetEarningsProps) {
   const theme = useMantineTheme();
   const [month, setMonth] = useState<DateValue>(new Date());
-  const commonQueryConstraints = [
+  const queryConstraints = [
     where('date', '>=', dayjs(month).startOf('month').format('YYYY-MM-DD')),
     where('date', '<=', dayjs(month).endOf('month').format('YYYY-MM-DD')),
   ];
-  const expensesQuery = query(expensesCollection, ...commonQueryConstraints);
-  const [expenses, expensesLoading] = useCollectionDataPersistent(expensesQuery);
-  const depositsQuery = query(depositsCollection, ...commonQueryConstraints);
-  const [deposits, depositsLoading] = useCollectionDataPersistent(depositsQuery);
-  const ordersQueryConstraints = [
-    where('status', '==', 'delivered'),
-    where('deliveredTimestamp', '>=', dayjs(month).startOf('month').valueOf()),
-    where('deliveredTimestamp', '<=', dayjs(month).endOf('month').valueOf()),
-  ];
-  const ordersQuery = query(ordersCollection, ...ordersQueryConstraints);
-  const [orders, ordersLoading] = useCollectionDataPersistent(ordersQuery);
+  const { data: expenses } = useCollection<Expense>({ path: 'expenses', queryConstraints });
+  const { data: deposits } = useCollection<Deposit>({ path: 'deposits', queryConstraints });
+  const { data: orders } = useCollection<Order>({
+    path: 'orders',
+    where: [
+      ['status', '==', 'delivered'],
+      ['deliveredTimestamp', '>=', dayjs(month).startOf('month').valueOf()],
+      ['deliveredTimestamp', '<=', dayjs(month).endOf('month').valueOf()],
+    ],
+  });
   const totalExpenses =
     expenses?.reduce((total, expense) => {
       if (!expense.deductFromFunds) total += expense.amount;
@@ -55,10 +55,7 @@ export default function NetEarnings({ opened, close }: NetEarningsProps) {
           value={month}
           onChange={setMonth}
         />
-        <Load
-          in={!(expensesLoading || depositsLoading || ordersLoading)}
-          style={{ minHeight: 163 }}
-        >
+        <Load in={!!(expenses && deposits && orders)} style={{ minHeight: 163 }}>
           <Paper
             bg={theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[1]}
             py={12}

@@ -46,6 +46,7 @@ export default function EarningsFilters({
             placeholder="Select dates range"
             firstDayOfWeek={0}
             defaultLevel="year"
+            clearable
             pt="md"
             value={dateRange}
             onChange={setDateRange}

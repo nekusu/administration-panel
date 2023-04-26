@@ -1,24 +1,23 @@
 import { DatesRangeValue } from '@mantine/dates';
+import { useCollection } from '@tatsuokaniwa/swr-firestore';
 import dayjs from 'dayjs';
-import { query, where } from 'firebase/firestore';
-import { expensesCollection } from 'lib/firebase/collections';
-import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
+import { where } from 'firebase/firestore';
+import { Expense } from 'types/expense';
 import { Summary } from 'types/filters';
 
 export default function useExpenses(dates: DatesRangeValue, filters: Summary) {
-  const expensesQueryConstraints = [where('deductFromFunds', '==', filters.showFundsExpenses)];
+  const queryConstraints = [where('deductFromFunds', '==', filters.showFundsExpenses)];
   if (dates.every((date) => !!date)) {
-    expensesQueryConstraints.push(
+    queryConstraints.push(
       where('date', '>=', dayjs(dates[0]).startOf('month').format('YYYY-MM-DD')),
       where('date', '<=', dayjs(dates[1]).endOf('month').format('YYYY-MM-DD'))
     );
   }
   if (filters.tags.length) {
-    expensesQueryConstraints.push(where('tagIds', 'array-contains-any', filters.tags));
+    queryConstraints.push(where('tagIds', 'array-contains-any', filters.tags));
   }
-  const expensesQuery = query(expensesCollection, ...expensesQueryConstraints);
-  const [expenses, loading] = useCollectionDataPersistent(expensesQuery);
+  const { data: expenses } = useCollection<Expense>({ path: 'expenses', queryConstraints });
   const total = expenses?.reduce((total, expense) => total + expense.amount, 0) ?? 0;
 
-  return { expenses, loading, total };
+  return { expenses, total };
 }

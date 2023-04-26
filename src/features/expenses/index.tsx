@@ -1,13 +1,12 @@
 import { Button, Group, Loader } from '@mantine/core';
 import { useDisclosure, useIntersection, useLocalStorage } from '@mantine/hooks';
+import { useCollection } from '@tatsuokaniwa/swr-firestore';
 import { ListManager, Load, MainLayout, Table } from 'components';
-import { limit, orderBy, query, QueryConstraint, where } from 'firebase/firestore';
-import { expensesCollection, tagsCollection } from 'lib/firebase/collections';
+import { QueryConstraint, limit, orderBy, where } from 'firebase/firestore';
 import { addTag } from 'lib/firebase/utils';
-import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
 import { useEffect, useRef, useState } from 'react';
 import { RiAddLine, RiSettings3Line } from 'react-icons/ri';
-import { Expense } from 'types/expense';
+import { Expense, Tag } from 'types/expense';
 import * as Filters from 'types/filters';
 import { ExpenseFilters, ExpenseForm, ExpenseItem } from './components';
 
@@ -18,8 +17,7 @@ interface ExpensesPageProps {
 const EXPENSES_LIMIT = 20;
 
 export default function ExpensesPage({ visibleNumbers }: ExpensesPageProps) {
-  const tagsQuery = query(tagsCollection, orderBy('name', 'asc'));
-  const [tags, tagsLoading] = useCollectionDataPersistent(tagsQuery);
+  const { data: tags } = useCollection<Tag>({ path: 'tags', orderBy: [['name', 'asc']] });
 
   const [filters, setFilters] = useLocalStorage<Filters.Expense>({
     key: 'expense-filters',
@@ -35,15 +33,14 @@ export default function ExpensesPage({ visibleNumbers }: ExpensesPageProps) {
   };
 
   const [expensesLimit, setExpensesLimit] = useState(EXPENSES_LIMIT);
-  const expensesQueryConstraints: QueryConstraint[] = [
+  const queryConstraints: QueryConstraint[] = [
     orderBy(filters.orderBy, filters.direction),
     limit(expensesLimit),
   ];
   if (filters.tags.length) {
-    expensesQueryConstraints.push(where('tagIds', 'array-contains-any', filters.tags));
+    queryConstraints.push(where('tagIds', 'array-contains-any', filters.tags));
   }
-  const expensesQuery = query(expensesCollection, ...expensesQueryConstraints);
-  const [expenses, expensesLoading] = useCollectionDataPersistent(expensesQuery);
+  const { data: expenses } = useCollection<Expense>({ path: 'expenses', queryConstraints });
 
   const [expenseFormOpened, expenseFormHandler] = useDisclosure(false);
   const [tagListOpened, tagListHandler] = useDisclosure(false);
@@ -53,7 +50,7 @@ export default function ExpensesPage({ visibleNumbers }: ExpensesPageProps) {
   const { ref, entry } = useIntersection({ root: bodyRef.current, threshold: 0.5 });
 
   useEffect(() => {
-    if (entry?.isIntersecting && !expensesLoading) {
+    if (entry?.isIntersecting && !!expenses) {
       setExpensesLimit((prevState) => prevState + EXPENSES_LIMIT);
     }
   }, [entry?.isIntersecting]);
@@ -62,7 +59,7 @@ export default function ExpensesPage({ visibleNumbers }: ExpensesPageProps) {
     <MainLayout>
       <MainLayout.Header
         title="Expenses"
-        loading={tagsLoading || expensesLoading}
+        loading={!tags || !expenses}
         buttons={
           <>
             <Button

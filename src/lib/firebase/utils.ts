@@ -1,35 +1,26 @@
-import { addDoc, deleteDoc, doc, DocumentData, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, DocumentData, updateDoc } from 'firebase/firestore';
 import { Client } from 'types/client';
 import { Deposit, Expense, Tag } from 'types/expense';
 import { Order } from 'types/order';
 import * as Stock from 'types/stock';
 import { db } from './app';
-import {
-  clientsCollection,
-  depositsCollection,
-  expensesCollection,
-  ordersCollection,
-  stockGroupsCollection,
-  stockItemsCollection,
-  stockMarkersCollection,
-  tagsCollection,
-} from './collections';
 
+export const addDocument = async <T>(path: string, data: T) => {
+  return await addDoc(collection(db, path), data as DocumentData);
+};
 export const editDocument = async <T>(path: string, id: string, data: T) => {
-  const reference = doc(db, path, id);
-  return await updateDoc(reference, data as DocumentData);
+  return await updateDoc(doc(db, path, id), data as DocumentData);
 };
 export const deleteDocument = async (path: string, id: string) => {
-  const reference = doc(db, path, id);
-  return await deleteDoc(reference);
+  return await deleteDoc(doc(db, path, id));
 };
 
 export const addClient = async (client: Omit<Client, 'id'>) => {
-  return await addDoc(clientsCollection, client);
+  return await addDocument('clients', client);
 };
 
 export const addOrder = async (order: Omit<Order, 'id'>) => {
-  return await addDoc(ordersCollection, order);
+  return await addDocument('orders', order);
 };
 export const editOrder = async (id: string, data: Partial<Omit<Order, 'id'>>) => {
   return await editDocument('orders', id, data);
@@ -39,11 +30,11 @@ export const deleteOrder = async (id: string) => {
 };
 
 export const addStockGroup = async (stockGroup: Omit<Stock.Group, 'id'>) => {
-  return await addDoc(stockGroupsCollection, stockGroup);
+  return await addDocument('groups', stockGroup);
 };
 
 export const addStockItem = async (stockGroupId: string, data: Omit<Stock.Item, 'id'>) => {
-  return await addDoc(stockItemsCollection(stockGroupId), data);
+  return await addDocument(`groups/${stockGroupId}/items`, data);
 };
 export const editStockItem = async (
   stockGroupId: string,
@@ -57,14 +48,14 @@ export const deleteStockItem = async (stockGroupId: string, id: string) => {
 };
 
 export const addStockMarker = async (stockGroupId: string, data: Omit<Stock.Marker, 'id'>) => {
-  return await addDoc(stockMarkersCollection(stockGroupId), data);
+  return await addDocument(`groups/${stockGroupId}/markers`, data);
 };
 export const deleteStockMarker = async (stockGroupId: string, id: string) => {
   return await deleteDocument(`groups/${stockGroupId}/markers`, id);
 };
 
 export const addExpense = async (expense: Omit<Expense, 'id'>) => {
-  return await addDoc(expensesCollection, expense);
+  return await addDocument('expenses', expense);
 };
 export const editExpense = async (id: string, data: Partial<Omit<Expense, 'id'>>) => {
   return await editDocument('expenses', id, data);
@@ -74,11 +65,11 @@ export const deleteExpense = async (id: string) => {
 };
 
 export const addTag = async (tag: Omit<Tag, 'id'>) => {
-  return await addDoc(tagsCollection, tag);
+  return await addDocument('tags', tag);
 };
 
 export const addDeposit = async (deposit: Omit<Deposit, 'id'>) => {
-  return await addDoc(depositsCollection, deposit);
+  return await addDocument('deposits', deposit);
 };
 export const deleteFund = async (id: string) => {
   return await deleteDocument('deposits', id);

@@ -1,9 +1,9 @@
 import { Box, Group } from '@mantine/core';
 import { useDisclosure, useLocalStorage } from '@mantine/hooks';
-import { FloatingButton, MantineProviders, Sidebar, SidePanel } from 'components';
+import { FloatingButton, MantineProviders, SidePanel, Sidebar } from 'components';
 import { MotionConfig } from 'framer-motion';
 import useBreakpoints from 'lib/mantine/useBreakpoints';
-import { lazy, Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 import {
   RiArchiveLine,
   RiBook2Line,
@@ -11,6 +11,7 @@ import {
   RiLayoutRightLine,
   RiMenuLine,
 } from 'react-icons/ri';
+import { SWRConfig } from 'swr';
 import * as Stock from 'types/stock';
 
 const OrdersPage = lazy(() => import('features/orders'));
@@ -63,37 +64,39 @@ export default function App() {
 
   return (
     <MantineProviders>
-      <MotionConfig transition={{ duration: 0.2 }}>
-        <Group spacing={0} noWrap>
-          <Sidebar
-            links={links}
-            pageIndex={pageIndex}
-            setPageIndex={setPageIndex}
-            opened={sidebarOpened}
-            onClose={sidebarHandler.close}
-          />
-          <Box className="modal-container" sx={{ minWidth: 0, position: 'relative', flex: 1 }}>
-            <Suspense>{pages[pageIndex]}</Suspense>
-          </Box>
-          <SidePanel
-            opened={visibleSidePanel}
-            onClose={() => setVisibleSidePanel(false)}
-            title={sidePanelTitles[pageIndex]}
-          >
-            <Suspense>{sidePanels[pageIndex]}</Suspense>
-          </SidePanel>
-          {isSmallScreen && (
-            <>
-              <FloatingButton bottom={0} left={0} onClick={sidebarHandler.toggle}>
-                <RiMenuLine />
-              </FloatingButton>
-              <FloatingButton bottom={0} right={0} onClick={() => setVisibleSidePanel(true)}>
-                <RiLayoutRightLine />
-              </FloatingButton>
-            </>
-          )}
-        </Group>
-      </MotionConfig>
+      <SWRConfig value={{ keepPreviousData: true }}>
+        <MotionConfig transition={{ duration: 0.2 }}>
+          <Group spacing={0} noWrap>
+            <Sidebar
+              links={links}
+              pageIndex={pageIndex}
+              setPageIndex={setPageIndex}
+              opened={sidebarOpened}
+              onClose={sidebarHandler.close}
+            />
+            <Box className="modal-container" sx={{ minWidth: 0, position: 'relative', flex: 1 }}>
+              <Suspense>{pages[pageIndex]}</Suspense>
+            </Box>
+            <SidePanel
+              opened={visibleSidePanel}
+              onClose={() => setVisibleSidePanel(false)}
+              title={sidePanelTitles[pageIndex]}
+            >
+              <Suspense>{sidePanels[pageIndex]}</Suspense>
+            </SidePanel>
+            {isSmallScreen && (
+              <>
+                <FloatingButton bottom={0} left={0} onClick={sidebarHandler.toggle}>
+                  <RiMenuLine />
+                </FloatingButton>
+                <FloatingButton bottom={0} right={0} onClick={() => setVisibleSidePanel(true)}>
+                  <RiLayoutRightLine />
+                </FloatingButton>
+              </>
+            )}
+          </Group>
+        </MotionConfig>
+      </SWRConfig>
     </MantineProviders>
   );
 }

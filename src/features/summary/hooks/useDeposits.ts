@@ -1,18 +1,21 @@
 import { DatesRangeValue } from '@mantine/dates';
+import { useCollection } from '@tatsuokaniwa/swr-firestore';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
-import { orderBy, query, where } from 'firebase/firestore';
-import { depositsCollection, expensesCollection } from 'lib/firebase/collections';
-import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
 import { useMemo } from 'react';
+import { Deposit, Expense } from 'types/expense';
 
 dayjs.extend(isBetween);
 
 export default function useDeposits(dates: DatesRangeValue) {
-  const expensesQuery = query(expensesCollection, where('deductFromFunds', '==', true));
-  const [expenses] = useCollectionDataPersistent(expensesQuery);
-  const depositsQuery = query(depositsCollection, orderBy('date', 'desc'));
-  const [deposits] = useCollectionDataPersistent(depositsQuery);
+  const { data: expenses } = useCollection<Expense>({
+    path: 'expenses',
+    where: [['deductFromFunds', '==', true]],
+  });
+  const { data: deposits } = useCollection<Deposit>({
+    path: 'deposits',
+    orderBy: [['date', 'desc']],
+  });
 
   const deposited = useMemo(() => {
     let deposited = 0;

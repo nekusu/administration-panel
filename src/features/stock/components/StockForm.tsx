@@ -21,7 +21,7 @@ import { MultiFormatColorInput } from './';
 interface StockItemFormProps {
   opened: boolean;
   closeForm(): void;
-  stockGroups?: Stock.Group[];
+  groups?: Stock.Group[];
   activeGroup?: Stock.Group;
   setActiveGroup: Dispatch<SetStateAction<Stock.Group | undefined>>;
 }
@@ -50,7 +50,7 @@ export default function StockItemForm({
   opened,
   closeForm,
   activeGroup,
-  stockGroups,
+  groups,
   setActiveGroup,
 }: StockItemFormProps) {
   const form = useForm<FormValues>({
@@ -91,7 +91,7 @@ export default function StockItemForm({
         <SimpleGrid cols={2} spacing="sm">
           <Select
             label="Group"
-            data={stockGroups?.map(({ id, name }) => ({ value: id, label: name })) ?? []}
+            data={groups?.map(({ id, name }) => ({ value: id, label: name })) ?? []}
             icon={isGroupLoading ? <Loader size={16} /> : <RiFolder3Line />}
             placeholder={isGroupLoading ? 'Loading group...' : 'Select group'}
             nothingFound="Group not found"
@@ -100,7 +100,7 @@ export default function StockItemForm({
             creatable
             searchable
             selectOnBlur
-            data-autofocus={stockGroups?.length && activeGroup ? undefined : true}
+            data-autofocus={groups?.length && activeGroup ? undefined : true}
             disabled={isGroupLoading}
             getCreateLabel={(query) => `+ Add group ${query}`}
             onCreate={(query) => {

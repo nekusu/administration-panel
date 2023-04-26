@@ -7,14 +7,13 @@ import {
   Tooltip,
   useMantineTheme,
 } from '@mantine/core';
-import { DatesRangeValue, DateValue } from '@mantine/dates';
+import { DateValue, DatesRangeValue } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
+import { useCollection } from '@tatsuokaniwa/swr-firestore';
 import { Load, Overview } from 'components';
-import { orderBy, query } from 'firebase/firestore';
-import { tagsCollection } from 'lib/firebase/collections';
-import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
 import { useState } from 'react';
 import { RiHistoryLine, RiInboxArchiveLine } from 'react-icons/ri';
+import { Tag } from 'types/expense';
 import { BarChart, DepositForm, DepositHistory, NetEarnings, SummaryFilters } from './components';
 import useChartData from './hooks/useChartData';
 import useDeposits from './hooks/useDeposits';
@@ -31,7 +30,7 @@ export default function Summary({ visibleNumbers }: SummaryProps) {
   const [month, setMonth] = useState<DateValue>(new Date());
   const [range, setRange] = useState<DatesRangeValue>([null, null]);
   const dates = filters.timeframe === 'month' ? ([month, month] as DatesRangeValue) : range;
-  const [tags] = useCollectionDataPersistent(query(tagsCollection, orderBy('name', 'asc')));
+  const { data: tags } = useCollection<Tag>({ path: 'tags', orderBy: [['name', 'asc']] });
   const { expenses, total } = useExpenses(dates, filters);
   const { deposits, deposited, remainingFunds } = useDeposits(dates);
   const chartData = useChartData(dates, filters.tags, tags, expenses, deposits);
