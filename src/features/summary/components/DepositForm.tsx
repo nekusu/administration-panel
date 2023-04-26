@@ -1,5 +1,5 @@
 import { Button, Group, Modal, NumberInput, Title } from '@mantine/core';
-import { DatePicker } from '@mantine/dates';
+import { DatePickerInput } from '@mantine/dates';
 import { useForm, zodResolver } from '@mantine/form';
 import dayjs from 'dayjs';
 import { addDeposit } from 'lib/firebase/utils';
@@ -42,7 +42,6 @@ export default function DepositForm({ opened, close }: DepositFormProps) {
       trapFocus
       onClose={close}
       target=".side-panel"
-      styles={{ overlay: { '&&': { position: 'absolute' } } }}
     >
       <form
         onSubmit={form.onSubmit((data) => {
@@ -69,7 +68,7 @@ export default function DepositForm({ opened, close }: DepositFormProps) {
             data-autofocus
             {...form.getInputProps('amount')}
           />
-          <DatePicker
+          <DatePickerInput
             label="Date"
             icon={<RiCalendarEventLine />}
             placeholder="Pick date"

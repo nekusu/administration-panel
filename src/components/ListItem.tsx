@@ -57,9 +57,13 @@ export default function ListItem<T extends SampleType>({ item, label }: ListItem
             placeholder="Enter name"
             data-autofocus
             pr="xs"
-            styles={(theme) => ({
-              input: { minHeight: 34, height: 34, paddingInline: theme.spacing.xs - 1 },
-            })}
+            styles={{
+              input: {
+                minHeight: 34,
+                height: 34,
+                paddingInline: '0.575rem',
+              },
+            }}
             sx={{ flex: 1 }}
             value={inputValue}
             onChange={(value) => setInputValue(value)}

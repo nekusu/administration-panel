@@ -162,11 +162,13 @@ export default function StockGroupFilters({
               onChange={(value) => updateFilter({ enabledMarkers: value })}
               multiple
             >
-              <AnimatePresence>
-                {markers?.map((marker) => (
-                  <StockMarker key={marker.id} activeGroup={activeGroup} marker={marker} />
-                ))}
-              </AnimatePresence>
+              <Group spacing="xs">
+                <AnimatePresence>
+                  {markers?.map((marker) => (
+                    <StockMarker key={marker.id} activeGroup={activeGroup} marker={marker} />
+                  ))}
+                </AnimatePresence>
+              </Group>
             </Chip.Group>
           ) : (
             addMarkerButton

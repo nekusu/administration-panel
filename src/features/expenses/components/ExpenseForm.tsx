@@ -11,7 +11,7 @@ import {
   Textarea,
   Title,
 } from '@mantine/core';
-import { DatePicker } from '@mantine/dates';
+import { DatePickerInput } from '@mantine/dates';
 import { useForm, zodResolver } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { ColorSelect, SelectItem, SelectValue } from 'components';
@@ -114,6 +114,7 @@ export default function ExpenseForm({ opened, closeForm, values, tags }: Expense
             onCreate={(query) => {
               setTagName(query);
               colorTagModalHandler.open();
+              return null;
             }}
             {...form.getInputProps('tagIds')}
           />
@@ -162,7 +163,7 @@ export default function ExpenseForm({ opened, closeForm, values, tags }: Expense
               data-autofocus
               {...form.getInputProps('amount')}
             />
-            <DatePicker
+            <DatePickerInput
               label="Date"
               icon={<RiCalendarEventLine />}
               placeholder="Pick date"

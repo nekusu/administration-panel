@@ -43,7 +43,7 @@ export default function Item({ item, activeGroup }: StockItemProps) {
     validate: zodResolver(schema),
   });
   const [colorPopoverOpened, colorPopoverHandler] = useDisclosure(false);
-  const [quantity, setQuantity] = useState(item.quantity);
+  const [quantity, setQuantity] = useState<number | ''>(item.quantity);
   const [debouncedQuantity, cancel] = useDebouncedValue(quantity, 500);
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function Item({ item, activeGroup }: StockItemProps) {
   }, [item.quantity]);
   useEffect(() => {
     if (activeGroup && item.quantity !== debouncedQuantity) {
-      editStockItem(activeGroup.id, item.id, { quantity: debouncedQuantity });
+      editStockItem(activeGroup.id, item.id, { quantity: debouncedQuantity || 0 });
     }
   }, [debouncedQuantity]);
 

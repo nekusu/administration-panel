@@ -1,10 +1,10 @@
 import { Divider, Group, Modal, Paper, Stack, Text, Title, useMantineTheme } from '@mantine/core';
+import { DateValue, MonthPickerInput } from '@mantine/dates';
 import { Load } from 'components';
 import dayjs from 'dayjs';
 import { query, where } from 'firebase/firestore';
 import { depositsCollection, expensesCollection, ordersCollection } from 'lib/firebase/collections';
 import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
-import { DateValue, MonthPickerInput } from 'mantine-dates-6';
 import { useState } from 'react';
 import { RiCalendarEventLine } from 'react-icons/ri';
 
@@ -47,7 +47,6 @@ export default function NetEarnings({ opened, close }: NetEarningsProps) {
       trapFocus
       onClose={close}
       target=".side-panel"
-      styles={{ overlay: { '&&': { position: 'absolute' } } }}
     >
       <Stack>
         <MonthPickerInput

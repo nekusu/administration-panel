@@ -1,5 +1,3 @@
-import { useRef } from 'react';
-import { RiAddLine, RiSubtractLine } from 'react-icons/ri';
 import {
   ActionIcon,
   createStyles,
@@ -7,6 +5,8 @@ import {
   NumberInput,
   NumberInputHandlers,
 } from '@mantine/core';
+import { useRef } from 'react';
+import { RiAddLine, RiSubtractLine } from 'react-icons/ri';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -50,8 +50,8 @@ const useStyles = createStyles((theme) => ({
 interface QuantityInputProps {
   min?: number;
   max?: number;
-  value?: number;
-  onChange?(value: number | undefined): void;
+  value?: number | '';
+  onChange?(value: number | ''): void;
 }
 
 export default function QuantityInput({ min, max, value, onChange }: QuantityInputProps) {

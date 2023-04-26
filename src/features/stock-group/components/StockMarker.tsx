@@ -32,7 +32,7 @@ export default function StockMarker({ activeGroup, marker }: StockMarkerProps) {
         initial="hidden"
         animate="visible"
         exit="hidden"
-        layout
+        layout="position"
         {...bind()}
       >
         <Chip

@@ -104,13 +104,16 @@ export default function StockItemForm({
             data-autofocus={stockGroups?.length && activeGroup ? undefined : true}
             disabled={isGroupLoading}
             getCreateLabel={(query) => `+ Add group ${query}`}
-            onCreate={async (query) => {
+            onCreate={(query) => {
               setIsGroupLoading(true);
-              const newGroupRef = await addStockGroup({ name: query });
-              const newGroup = await getDoc(newGroupRef);
-              setIsGroupLoading(false);
-              setActiveGroup({ id: newGroup.id, name: query });
-              form.setFieldValue('stockGroupId', newGroup.id);
+              addStockGroup({ name: query })
+                .then((newGroupRef) => getDoc(newGroupRef))
+                .then((newGroup) => {
+                  setIsGroupLoading(false);
+                  setActiveGroup({ id: newGroup.id, name: query });
+                  form.setFieldValue('stockGroupId', newGroup.id);
+                });
+              return null;
             }}
             {...form.getInputProps('stockGroupId')}
           />

@@ -9,8 +9,8 @@ import {
   Switch,
   useMantineTheme,
 } from '@mantine/core';
+import { DatesRangeValue, DateValue, MonthPickerInput } from '@mantine/dates';
 import { LabeledSegmentedControl, SelectItem, SelectValue } from 'components';
-import { DatesRangeValue, DateValue, MonthPickerInput } from 'mantine-dates-6';
 import { Dispatch, SetStateAction } from 'react';
 import { RiCalendarEventLine, RiPriceTag3Line } from 'react-icons/ri';
 import { Tag } from 'types/expense';

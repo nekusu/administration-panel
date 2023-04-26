@@ -97,14 +97,14 @@ export default function SidePanel({
         </motion.div>
       ) : (
         <Drawer
-          classNames={{ drawer: 'side-panel' }}
+          classNames={{ content: 'side-panel' }}
           position="right"
           title={<Title order={1}>{title}</Title>}
           padding="lg"
           size="min(650px, 100vw)"
           opened={opened}
           onClose={onClose}
-          styles={{ drawer: { overflowY: 'auto' } }}
+          styles={{ content: { overflowY: 'auto' } }}
         >
           {children}
         </Drawer>

@@ -55,7 +55,6 @@ export default function ListManager<T extends SampleType>({
       opened={opened}
       title={<Title order={5}>{`Manage ${label}s`}</Title>}
       size={420}
-      overflow="inside"
       trapFocus
       onClose={close}
       target=".modal-container"
@@ -70,7 +69,7 @@ export default function ListManager<T extends SampleType>({
           value={searchValue}
           onChange={setSearchValue}
         />
-        <ScrollArea.Autosize maxHeight={`calc(${height}px - 240px)`}>
+        <ScrollArea.Autosize mah={`calc(${height}px - 240px)`}>
           <Stack spacing="xs" pb={2}>
             {filteredClients?.map((item) => (
               <ListItem key={item.id} item={item} label={label} />

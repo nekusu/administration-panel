@@ -1,5 +1,5 @@
 import { Box, Checkbox, Collapse, createStyles, Group, MultiSelect, Stack } from '@mantine/core';
-import { DateRangePicker, DateRangePickerValue, getWeekdaysNames } from '@mantine/dates';
+import { DatePickerInput, DatesRangeValue, getWeekdayNames } from '@mantine/dates';
 import { LabeledSegmentedControl } from 'components';
 import { Dispatch, SetStateAction } from 'react';
 import { RiCalendar2Line, RiCalendarEventLine } from 'react-icons/ri';
@@ -8,8 +8,8 @@ import * as Filters from 'types/filters';
 interface EarningsFiltersProps {
   filters: Filters.Earnings;
   updateFilter(value: Partial<Filters.Earnings>): void;
-  dateRange: DateRangePickerValue;
-  setDateRange: Dispatch<SetStateAction<DateRangePickerValue>>;
+  dateRange: DatesRangeValue;
+  setDateRange: Dispatch<SetStateAction<DatesRangeValue>>;
 }
 
 const useStyles = createStyles((theme) => ({
@@ -40,11 +40,12 @@ export default function EarningsFilters({
           onChange={(value: Filters.Earnings['timeframe']) => updateFilter({ timeframe: value })}
         />
         <Collapse in={filters.timeframe === 'custom'}>
-          <DateRangePicker
+          <DatePickerInput
+            type="range"
             icon={<RiCalendar2Line />}
             placeholder="Select dates range"
-            firstDayOfWeek="sunday"
-            initialLevel="month"
+            firstDayOfWeek={0}
+            defaultLevel="year"
             pt="md"
             value={dateRange}
             onChange={setDateRange}
@@ -54,10 +55,12 @@ export default function EarningsFilters({
       <Stack>
         <MultiSelect
           label="Exclude"
-          data={getWeekdaysNames('en', 'sunday', 'dddd').map((day, index) => ({
-            label: day,
-            value: index.toString(),
-          }))}
+          data={getWeekdayNames({ locale: 'en', format: 'dddd', firstDayOfWeek: 0 }).map(
+            (day, index) => ({
+              label: day,
+              value: index.toString(),
+            })
+          )}
           icon={<RiCalendarEventLine />}
           placeholder="Select days"
           value={filters.excludedDays}

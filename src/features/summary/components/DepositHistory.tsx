@@ -45,7 +45,6 @@ export default function DepositHistory({ opened, close, deposits }: DepositHisto
       trapFocus
       onClose={close}
       target=".side-panel"
-      styles={{ overlay: { '&&': { position: 'absolute' } } }}
     >
       {deposits?.length ? (
         <Table

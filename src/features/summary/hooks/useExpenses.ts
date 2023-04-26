@@ -1,8 +1,8 @@
+import { DatesRangeValue } from '@mantine/dates';
 import dayjs from 'dayjs';
 import { query, where } from 'firebase/firestore';
 import { expensesCollection } from 'lib/firebase/collections';
 import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
-import { DatesRangeValue } from 'mantine-dates-6';
 import { Summary } from 'types/filters';
 
 export default function useExpenses(dates: DatesRangeValue, filters: Summary) {

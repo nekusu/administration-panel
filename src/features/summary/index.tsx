@@ -7,12 +7,12 @@ import {
   Tooltip,
   useMantineTheme,
 } from '@mantine/core';
+import { DatesRangeValue, DateValue } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
 import { Load, Overview } from 'components';
 import { orderBy, query } from 'firebase/firestore';
 import { tagsCollection } from 'lib/firebase/collections';
 import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
-import { DatesRangeValue, DateValue } from 'mantine-dates-6';
 import { useState } from 'react';
 import { RiHistoryLine, RiInboxArchiveLine } from 'react-icons/ri';
 import { BarChart, DepositForm, DepositHistory, NetEarnings, SummaryFilters } from './components';

@@ -83,12 +83,15 @@ export default function OrderForm({ opened, closeForm, values, clients }: OrderF
             data-autofocus={values ? undefined : true}
             disabled={isClientLoading}
             getCreateLabel={(query) => `+ Add client ${query}`}
-            onCreate={async (query) => {
+            onCreate={(query) => {
               setIsClientLoading(true);
-              const newClientRef = await addClient({ name: query });
-              const newClient = await getDoc(newClientRef);
-              setIsClientLoading(false);
-              form.setFieldValue('clientId', newClient.id);
+              addClient({ name: query })
+                .then((newClientRef) => getDoc(newClientRef))
+                .then((newClient) => {
+                  setIsClientLoading(false);
+                  form.setFieldValue('clientId', newClient.id);
+                });
+              return null;
             }}
             {...form.getInputProps('clientId')}
           />

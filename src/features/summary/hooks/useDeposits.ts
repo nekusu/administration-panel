@@ -1,9 +1,9 @@
+import { DatesRangeValue } from '@mantine/dates';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import { orderBy, query, where } from 'firebase/firestore';
 import { depositsCollection, expensesCollection } from 'lib/firebase/collections';
 import { useCollectionDataPersistent } from 'lib/react-firebase-hooks/useCollectionDataPersistent';
-import { DatesRangeValue } from 'mantine-dates-6';
 import { useMemo } from 'react';
 
 dayjs.extend(isBetween);

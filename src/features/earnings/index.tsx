@@ -1,5 +1,5 @@
 import { Collapse, Stack } from '@mantine/core';
-import { DateRangePickerValue } from '@mantine/dates';
+import { DatesRangeValue } from '@mantine/dates';
 import { useLocalStorage } from '@mantine/hooks';
 import { Datum } from '@nivo/line';
 import { Load, Overview } from 'components';
@@ -30,7 +30,7 @@ export default function Earnings({ visibleNumbers }: EarningsProps) {
     setFilters((prevState) => ({ ...prevState, ...value }));
   };
 
-  const [dateRange, setDateRange] = useState<DateRangePickerValue>([null, null]);
+  const [dateRange, setDateRange] = useState<DatesRangeValue>([null, null]);
   const [startTime, endTime] =
     filters.timeframe === 'custom'
       ? dateRange.map((date) => dayjs(date))

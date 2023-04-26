@@ -1,8 +1,8 @@
+import { DatesRangeValue } from '@mantine/dates';
 import { BarDatum } from '@nivo/bar';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import localeData from 'dayjs/plugin/localeData';
-import { DatesRangeValue } from 'mantine-dates-6';
 import { Deposit, Expense, Tag } from 'types/expense';
 
 dayjs.extend(localeData);

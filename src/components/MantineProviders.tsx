@@ -1,4 +1,3 @@
-import { ReactNode } from 'react';
 import {
   ActionIconProps,
   ColorScheme,
@@ -17,6 +16,7 @@ import {
 } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { ModalsProvider } from '@mantine/modals';
+import { ReactNode } from 'react';
 
 interface MantineProvidersProps {
   children: ReactNode;
@@ -26,15 +26,22 @@ const ActionIconDefaultProps: Partial<ActionIconProps> = {
   size: 'lg',
   variant: 'subtle',
 };
-const DrawerDefaultProps: Partial<DrawerProps> = {};
+const DrawerDefaultProps: Partial<DrawerProps> = {
+  overlayProps: { opacity: 0.5 },
+};
 const LoaderDefaultProps: Partial<LoaderProps> = {
   size: 50,
 };
 const ModalDefaultProps: Partial<ModalProps> = {
   size: 'auto',
   shadow: 'lg',
+  padding: 'lg',
   zIndex: 3,
-  sx: { position: 'absolute' },
+  styles: {
+    overlay: { position: 'absolute' },
+    inner: { position: 'absolute', inset: 0, '&&': { paddingInline: '3vw' } },
+  },
+  overlayProps: { opacity: 0.5 },
 };
 const NumberInputDefaultProps: Partial<NumberInputProps> = {
   precision: 0,
@@ -44,13 +51,16 @@ const NumberInputDefaultProps: Partial<NumberInputProps> = {
 };
 const PopoverDefaultProps: Partial<PopoverProps> = {
   shadow: 'lg',
+  withinPortal: true,
 };
 const SelectDefaultProps: Partial<MultiSelectProps | SelectProps> = {
   clearable: true,
   maxDropdownHeight: 500,
-  transition: 'fade',
-  transitionDuration: 200,
-  clearButtonTabIndex: -1,
+  transitionProps: {
+    transition: 'fade',
+    duration: 200,
+  },
+  clearButtonProps: { tabIndex: -1 },
 };
 const InputDefaultProps: Partial<TextInputProps> = {
   autoComplete: 'off',
@@ -87,9 +97,6 @@ export default function MantineProviders({ children }: MantineProvidersProps) {
 
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
-
-  DrawerDefaultProps.overlayOpacity = colorScheme === 'dark' ? 0.8 : 0.4;
-  ModalDefaultProps.overlayOpacity = colorScheme === 'dark' ? 0.8 : 0.4;
 
   return (
     <MantineProvider
