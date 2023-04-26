@@ -9,7 +9,6 @@ import {
   NumberInput,
   Stack,
   Textarea,
-  Title,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useForm, zodResolver } from '@mantine/form';
@@ -76,7 +75,7 @@ export default function ExpenseForm({ opened, closeForm, values, tags }: Expense
   return (
     <Modal
       opened={opened}
-      title={<Title order={5}>{values ? 'Edit expense' : 'Add expense'}</Title>}
+      title={values ? 'Edit expense' : 'Add expense'}
       size={520}
       trapFocus
       onClose={closeForm}
@@ -120,7 +119,7 @@ export default function ExpenseForm({ opened, closeForm, values, tags }: Expense
           />
           <Modal
             opened={colorTagModalOpened}
-            title={<Title order={5}>Select tag color</Title>}
+            title="Select tag color"
             onClose={colorTagModalHandler.close}
             target=".modal-container"
           >

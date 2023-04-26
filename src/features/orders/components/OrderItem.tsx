@@ -6,7 +6,6 @@ import {
   NumberInput,
   Popover,
   Text,
-  Title,
   Tooltip,
   useMantineTheme,
 } from '@mantine/core';
@@ -77,7 +76,7 @@ export default function OrderItem({
   };
   const openPendingModal = () =>
     openConfirmModal({
-      title: <Title order={5}>Are you sure you want to mark this order as pending again?</Title>,
+      title: 'Are you sure you want to mark this order as pending again?',
       children: <Text size="sm">The delivery date will be lost.</Text>,
       labels: { confirm: 'Confirm', cancel: 'Cancel' },
       onConfirm: () => editOrder(order.id, { status: 'pending', deliveredTimestamp: null }),
@@ -85,7 +84,7 @@ export default function OrderItem({
     });
   const openDeleteModal = () =>
     openConfirmModal({
-      title: <Title order={5}>Are you sure you want to delete this order?</Title>,
+      title: 'Are you sure you want to delete this order?',
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       onConfirm: () => deleteOrder(order.id),
       confirmProps: { color: 'red' },

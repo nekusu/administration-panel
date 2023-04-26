@@ -1,12 +1,4 @@
-import {
-  ActionIcon,
-  ColorSwatch,
-  Group,
-  Popover,
-  Title,
-  Tooltip,
-  useMantineTheme,
-} from '@mantine/core';
+import { ActionIcon, ColorSwatch, Group, Popover, Tooltip, useMantineTheme } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
 import { openConfirmModal } from '@mantine/modals';
@@ -66,7 +58,7 @@ export default function Item({ item, activeGroup }: StockItemProps) {
 
   const openDeleteModal = () =>
     openConfirmModal({
-      title: <Title order={5}>Are you sure you want to delete this item?</Title>,
+      title: 'Are you sure you want to delete this item?',
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       onConfirm: () => {
         if (activeGroup) {

@@ -1,4 +1,4 @@
-import { Button, Group, Modal, NumberInput, Title } from '@mantine/core';
+import { Button, Group, Modal, NumberInput } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useForm, zodResolver } from '@mantine/form';
 import dayjs from 'dayjs';
@@ -37,7 +37,7 @@ export default function DepositForm({ opened, close }: DepositFormProps) {
   return (
     <Modal
       opened={opened}
-      title={<Title order={5}>Deposit</Title>}
+      title="Deposit"
       size={440}
       trapFocus
       onClose={close}

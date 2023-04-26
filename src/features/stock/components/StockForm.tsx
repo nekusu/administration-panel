@@ -7,7 +7,6 @@ import {
   Select,
   SimpleGrid,
   TextInput,
-  Title,
 } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { getDoc } from 'firebase/firestore';
@@ -77,7 +76,7 @@ export default function StockItemForm({
   return (
     <Modal
       opened={opened}
-      title={<Title order={5}>Add item</Title>}
+      title="Add item"
       size={520}
       trapFocus
       onClose={closeForm}

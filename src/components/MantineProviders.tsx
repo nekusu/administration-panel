@@ -40,6 +40,7 @@ const ModalDefaultProps: Partial<ModalProps> = {
   styles: {
     overlay: { position: 'absolute' },
     inner: { position: 'absolute', inset: 0, '&&': { paddingInline: '3vw' } },
+    title: { fontWeight: 700 },
   },
   overlayProps: { opacity: 0.5 },
 };

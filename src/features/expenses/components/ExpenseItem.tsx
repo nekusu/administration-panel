@@ -1,13 +1,4 @@
-import {
-  ActionIcon,
-  Badge,
-  Group,
-  Text,
-  ThemeIcon,
-  Title,
-  Tooltip,
-  useMantineTheme,
-} from '@mantine/core';
+import { ActionIcon, Badge, Group, Text, ThemeIcon, Tooltip, useMantineTheme } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { Table } from 'components';
 import dayjs from 'dayjs';
@@ -40,7 +31,7 @@ export default function ExpenseItem({
 
   const openDeleteModal = () =>
     openConfirmModal({
-      title: <Title order={5}>Are you sure you want to delete this expense?</Title>,
+      title: 'Are you sure you want to delete this expense?',
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       onConfirm: () => deleteExpense(expense.id),
       confirmProps: { color: 'red' },

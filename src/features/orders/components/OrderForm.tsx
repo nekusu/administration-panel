@@ -1,4 +1,4 @@
-import { Button, Group, Loader, Modal, NumberInput, Select, Title } from '@mantine/core';
+import { Button, Group, Loader, Modal, NumberInput, Select } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import dayjs from 'dayjs';
 import { getDoc } from 'firebase/firestore';
@@ -47,7 +47,7 @@ export default function OrderForm({ opened, closeForm, values, clients }: OrderF
   return (
     <Modal
       opened={opened}
-      title={<Title order={5}>{values ? 'Edit order' : 'Add order'}</Title>}
+      title={values ? 'Edit order' : 'Add order'}
       size={520}
       trapFocus
       onClose={closeForm}

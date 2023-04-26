@@ -99,12 +99,15 @@ export default function SidePanel({
         <Drawer
           classNames={{ content: 'side-panel' }}
           position="right"
-          title={<Title order={1}>{title}</Title>}
+          title={title}
           padding="lg"
           size="min(650px, 100vw)"
           opened={opened}
           onClose={onClose}
-          styles={{ content: { overflowY: 'auto' } }}
+          styles={{
+            content: { overflowY: 'auto' },
+            title: { fontSize: '2.125rem', fontWeight: 700 },
+          }}
         >
           {children}
         </Drawer>

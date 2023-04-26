@@ -1,12 +1,4 @@
-import {
-  ActionIcon,
-  Alert,
-  MantineSize,
-  Modal,
-  Title,
-  Tooltip,
-  useMantineTheme,
-} from '@mantine/core';
+import { ActionIcon, Alert, MantineSize, Modal, Tooltip, useMantineTheme } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { Table } from 'components';
 import dayjs from 'dayjs';
@@ -28,7 +20,7 @@ export default function DepositHistory({ opened, close, deposits }: DepositHisto
 
   const openDeleteModal = (id: string) =>
     openConfirmModal({
-      title: <Title order={5}>Are you sure you want to delete this deposit?</Title>,
+      title: 'Are you sure you want to delete this deposit?',
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       onConfirm: () => deleteFund(id),
       confirmProps: { color: 'red' },
@@ -40,7 +32,7 @@ export default function DepositHistory({ opened, close, deposits }: DepositHisto
   return (
     <Modal
       opened={opened}
-      title={<Title order={5}>Deposit history</Title>}
+      title="Deposit history"
       size={440}
       trapFocus
       onClose={close}

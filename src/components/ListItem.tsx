@@ -1,4 +1,4 @@
-import { ActionIcon, Text, TextInput, Title, Tooltip, useMantineTheme } from '@mantine/core';
+import { ActionIcon, Text, TextInput, Tooltip, useMantineTheme } from '@mantine/core';
 import { useClickOutside, useInputState } from '@mantine/hooks';
 import { openConfirmModal } from '@mantine/modals';
 import { motion } from 'framer-motion';
@@ -26,7 +26,7 @@ export default function ListItem<T extends SampleType>({ item, label }: ListItem
 
   const openDeleteModal = () =>
     openConfirmModal({
-      title: <Title order={5}>{`Are you sure you want to delete this ${label}?`}</Title>,
+      title: `Are you sure you want to delete this ${label}?`,
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       onConfirm: () => deleteDocument(path, item.id),
       confirmProps: { color: 'red' },

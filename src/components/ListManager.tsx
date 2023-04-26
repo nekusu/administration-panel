@@ -5,7 +5,6 @@ import {
   Stack,
   Text,
   TextInput,
-  Title,
   Tooltip,
   useMantineTheme,
 } from '@mantine/core';
@@ -53,7 +52,7 @@ export default function ListManager<T extends SampleType>({
   return (
     <Modal
       opened={opened}
-      title={<Title order={5}>{`Manage ${label}s`}</Title>}
+      title={`Manage ${label}s`}
       size={420}
       trapFocus
       onClose={close}

@@ -1,4 +1,4 @@
-import { Divider, Group, Modal, Paper, Stack, Text, Title, useMantineTheme } from '@mantine/core';
+import { Divider, Group, Modal, Paper, Stack, Text, useMantineTheme } from '@mantine/core';
 import { DateValue, MonthPickerInput } from '@mantine/dates';
 import { Load } from 'components';
 import dayjs from 'dayjs';
@@ -42,7 +42,7 @@ export default function NetEarnings({ opened, close }: NetEarningsProps) {
   return (
     <Modal
       opened={opened}
-      title={<Title order={5}>Net earnings</Title>}
+      title="Net earnings"
       size={440}
       trapFocus
       onClose={close}
