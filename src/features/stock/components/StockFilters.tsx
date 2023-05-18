@@ -1,5 +1,6 @@
 import { Group, Text, TextInput } from '@mantine/core';
 import { LabeledSegmentedControl } from 'components';
+import { useFilters } from 'context/filters';
 import {
   RiArrowDownLine,
   RiArrowUpLine,
@@ -7,15 +8,15 @@ import {
   RiNumbersLine,
   RiSearchLine,
 } from 'react-icons/ri';
-import * as Filters from 'types/filters';
+import { Stock } from 'types/filters';
 
 interface StockFilters {
   setSearchValue(value: string): void;
-  filters: Filters.Stock;
-  updateFilter(value: Partial<Filters.Stock>): void;
 }
 
-export default function StockFilters({ setSearchValue, filters, updateFilter }: StockFilters) {
+export default function StockFilters({ setSearchValue }: StockFilters) {
+  const { stock: filters, setFilters } = useFilters();
+
   return (
     <>
       <TextInput
@@ -49,7 +50,9 @@ export default function StockFilters({ setSearchValue, filters, updateFilter }: 
           },
         ]}
         value={filters.orderBy}
-        onChange={(value: Filters.Stock['orderBy']) => updateFilter({ orderBy: value })}
+        onChange={(value: Stock['orderBy']) =>
+          setFilters((draft) => void (draft.stock.orderBy = value))
+        }
       />
       <LabeledSegmentedControl
         label="Direction"
@@ -74,7 +77,9 @@ export default function StockFilters({ setSearchValue, filters, updateFilter }: 
           },
         ]}
         value={filters.direction}
-        onChange={(value: Filters.Stock['direction']) => updateFilter({ direction: value })}
+        onChange={(value: Stock['direction']) =>
+          setFilters((draft) => void (draft.stock.direction = value))
+        }
       />
     </>
   );

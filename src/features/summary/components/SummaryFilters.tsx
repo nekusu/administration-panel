@@ -11,14 +11,13 @@ import {
 } from '@mantine/core';
 import { DatesRangeValue, DateValue, MonthPickerInput } from '@mantine/dates';
 import { LabeledSegmentedControl, SelectItem, SelectValue } from 'components';
+import { useFilters } from 'context/filters';
 import { Dispatch, SetStateAction } from 'react';
 import { RiCalendarEventLine, RiPriceTag3Line } from 'react-icons/ri';
 import { Tag } from 'types/expense';
-import * as Filters from 'types/filters';
+import { Summary } from 'types/filters';
 
 interface SummaryFiltersProps {
-  filters: Filters.Summary;
-  setFilters(value: Partial<Filters.Summary>): void;
   tags?: Tag[];
   month: DateValue;
   setMonth: Dispatch<SetStateAction<DateValue>>;
@@ -37,14 +36,13 @@ const useStyles = createStyles((theme) => ({
 const TIMEFRAME_UNITS = ['Month', 'Custom'];
 
 export default function SummaryFilters({
-  filters,
-  setFilters,
   tags,
   month,
   setMonth,
   range,
   setRange,
 }: SummaryFiltersProps) {
+  const { summary: filters, setFilters } = useFilters();
   const theme = useMantineTheme();
   const { classes } = useStyles();
 
@@ -55,7 +53,9 @@ export default function SummaryFilters({
           label="Timeframe"
           data={TIMEFRAME_UNITS.map((unit) => ({ label: unit, value: unit.toLowerCase() }))}
           value={filters.timeframe}
-          onChange={(value: Filters.Summary['timeframe']) => setFilters({ timeframe: value })}
+          onChange={(value: Summary['timeframe']) =>
+            setFilters((draft) => void (draft.summary.timeframe = value))
+          }
         />
         {filters.timeframe === 'month' ? (
           <MonthPickerInput icon={<RiCalendarEventLine />} value={month} onChange={setMonth} />
@@ -81,12 +81,14 @@ export default function SummaryFilters({
           valueComponent={SelectValue}
           searchable
           value={filters.tags}
-          onChange={(value) => setFilters({ tags: value })}
+          onChange={(value) => setFilters((draft) => void (draft.summary.tags = value))}
         />
         <Switch
           label="Only show expenses deducted from funds"
           checked={filters.showFundsExpenses}
-          onChange={({ target: { checked } }) => setFilters({ showFundsExpenses: checked })}
+          onChange={({ target: { checked } }) =>
+            setFilters((draft) => void (draft.summary.showFundsExpenses = checked))
+          }
           radius={theme.radius[theme.defaultRadius as MantineSize]}
           mb={-8}
           styles={{ input: { position: 'absolute' } }}
@@ -95,12 +97,16 @@ export default function SummaryFilters({
           <Checkbox
             label="Enable left ticks"
             checked={filters.enableLeftTicks}
-            onChange={({ target: { checked } }) => setFilters({ enableLeftTicks: checked })}
+            onChange={({ target: { checked } }) =>
+              setFilters((draft) => void (draft.summary.enableLeftTicks = checked))
+            }
           />
           <Checkbox
             label="Enable labels"
             checked={filters.enableLabels}
-            onChange={({ target: { checked } }) => setFilters({ enableLabels: checked })}
+            onChange={({ target: { checked } }) =>
+              setFilters((draft) => void (draft.summary.enableLabels = checked))
+            }
           />
         </Group>
       </Stack>

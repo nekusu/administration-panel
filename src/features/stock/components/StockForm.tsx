@@ -9,9 +9,10 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
+import { useGlobal } from 'context/global';
 import { getDoc } from 'firebase/firestore';
 import { addStockGroup, addStockItem } from 'lib/firebase/utils';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { RiFolder3Line, RiHashtag, RiNumbersLine } from 'react-icons/ri';
 import tinycolor from 'tinycolor2';
 import * as Stock from 'types/stock';
@@ -22,8 +23,6 @@ interface StockItemFormProps {
   opened: boolean;
   closeForm(): void;
   groups?: Stock.Group[];
-  activeGroup?: Stock.Group;
-  setActiveGroup: Dispatch<SetStateAction<Stock.Group | undefined>>;
 }
 
 interface FormValues {
@@ -46,13 +45,8 @@ const schema = z.object({
     }),
 });
 
-export default function StockItemForm({
-  opened,
-  closeForm,
-  activeGroup,
-  groups,
-  setActiveGroup,
-}: StockItemFormProps) {
+export default function StockItemForm({ opened, closeForm, groups }: StockItemFormProps) {
+  const { activeGroup, setGlobal } = useGlobal();
   const form = useForm<FormValues>({
     initialValues: {
       stockGroupId: '',
@@ -109,7 +103,7 @@ export default function StockItemForm({
                 .then((newGroupRef) => getDoc(newGroupRef))
                 .then((newGroup) => {
                   setIsGroupLoading(false);
-                  setActiveGroup({ id: newGroup.id, name: query });
+                  setGlobal((draft) => void (draft.activeGroup = { id: newGroup.id, name: query }));
                   form.setFieldValue('stockGroupId', newGroup.id);
                 });
               return null;

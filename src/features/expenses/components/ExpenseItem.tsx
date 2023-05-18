@@ -1,6 +1,7 @@
 import { ActionIcon, Badge, Group, Text, ThemeIcon, Tooltip, useMantineTheme } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { Table } from 'components';
+import { useGlobal } from 'context/global';
 import dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -12,7 +13,6 @@ import { Expense, Tag } from 'types/expense';
 interface ExpenseItemProps {
   expense: Expense;
   tags?: Tag[];
-  visibleNumbers: boolean;
   setFormValues: Dispatch<SetStateAction<Expense | undefined>>;
   openExpenseForm: () => void;
 }
@@ -23,10 +23,10 @@ dayjs.extend(localizedFormat);
 export default function ExpenseItem({
   expense,
   tags,
-  visibleNumbers,
   setFormValues,
   openExpenseForm,
 }: ExpenseItemProps) {
+  const { filterNumber } = useGlobal();
   const theme = useMantineTheme();
 
   const openDeleteModal = () =>
@@ -61,7 +61,7 @@ export default function ExpenseItem({
               </ThemeIcon>
             </Tooltip>
           )}
-          {visibleNumbers ? `$${expense.amount.toLocaleString()}` : '*****'}
+          {filterNumber(expense.amount)}
         </Group>
       </td>
       <td>

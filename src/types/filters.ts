@@ -1,13 +1,13 @@
 import { OrderByDirection } from 'firebase/firestore';
 
 export interface Order {
-  status: 'all' | 'pending' | 'finished' | 'delivered';
+  status: 'pending' | 'finished' | 'delivered';
   orderBy: 'price' | 'receivedTimestamp' | 'deliveredTimestamp';
   direction: OrderByDirection;
   clients: string[];
   lastValues: Partial<
     Record<
-      'all' | 'pending' | 'finished' | 'delivered',
+      'pending' | 'finished' | 'delivered',
       {
         orderBy: 'price' | 'receivedTimestamp' | 'deliveredTimestamp';
         direction: OrderByDirection;

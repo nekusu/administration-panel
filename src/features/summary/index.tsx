@@ -11,6 +11,8 @@ import { DateValue, DatesRangeValue } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
 import { useCollection } from '@tatsuokaniwa/swr-firestore';
 import { Load, Overview } from 'components';
+import { useFilters } from 'context/filters';
+import { useGlobal } from 'context/global';
 import { useState } from 'react';
 import { RiHistoryLine, RiInboxArchiveLine } from 'react-icons/ri';
 import { Tag } from 'types/expense';
@@ -18,15 +20,11 @@ import { BarChart, DepositForm, DepositHistory, NetEarnings, SummaryFilters } fr
 import useChartData from './hooks/useChartData';
 import useDeposits from './hooks/useDeposits';
 import useExpenses from './hooks/useExpenses';
-import useFilters from './hooks/useFilters';
 
-interface SummaryProps {
-  visibleNumbers: boolean;
-}
-
-export default function Summary({ visibleNumbers }: SummaryProps) {
+export default function Summary() {
+  const { visibleNumbers, filterNumber } = useGlobal();
+  const { summary: filters } = useFilters();
   const theme = useMantineTheme();
-  const [filters, setFilters] = useFilters();
   const [month, setMonth] = useState<DateValue>(new Date());
   const [range, setRange] = useState<DatesRangeValue>([null, null]);
   const dates = filters.timeframe === 'month' ? ([month, month] as DatesRangeValue) : range;
@@ -44,18 +42,9 @@ export default function Summary({ visibleNumbers }: SummaryProps) {
         <Stack spacing={0}>
           <Overview
             items={[
-              {
-                text: visibleNumbers ? `$${total.toLocaleString()}` : '*****',
-                sub: 'Expenses',
-              },
-              {
-                text: visibleNumbers ? `$${deposited.toLocaleString()}` : '*****',
-                sub: 'Deposited',
-              },
-              {
-                text: visibleNumbers ? `$${remainingFunds.toLocaleString()}` : '*****',
-                sub: 'Remaining funds',
-              },
+              { text: filterNumber(total), sub: 'Expenses' },
+              { text: filterNumber(deposited), sub: 'Deposited' },
+              { text: filterNumber(remainingFunds), sub: 'Remaining funds' },
             ]}
           />
           <Collapse in={visibleNumbers && dates.every((date) => !!date)}>
@@ -99,8 +88,6 @@ export default function Summary({ visibleNumbers }: SummaryProps) {
         deposits={deposits}
       />
       <SummaryFilters
-        filters={filters}
-        setFilters={setFilters}
         tags={tags}
         month={month}
         setMonth={setMonth}

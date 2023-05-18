@@ -1,43 +1,43 @@
 import { Button, Group, Loader } from '@mantine/core';
 import { useDisclosure, useIntersection } from '@mantine/hooks';
-import { useCollection } from '@tatsuokaniwa/swr-firestore';
+import { useCollection, useCollectionCount } from '@tatsuokaniwa/swr-firestore';
 import { ListManager, Load, MainLayout, Table } from 'components';
+import { useFilters } from 'context/filters';
 import { QueryConstraint, limit, orderBy, where } from 'firebase/firestore';
+import { AnimatePresence } from 'framer-motion';
 import { addClient } from 'lib/firebase/utils';
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { RiAddLine, RiUserSettingsLine } from 'react-icons/ri';
 import { Client } from 'types/client';
 import { Order } from 'types/order';
 import { OrderFilters, OrderForm, OrderItem } from './components';
-import useFilters from './hooks/useFilters';
-
-interface OrdersPageProps {
-  visibleNumbers: boolean;
-}
 
 const ORDERS_LIMIT = 20;
 
-export default function OrdersPage({ visibleNumbers }: OrdersPageProps) {
-  const [filters, setFilters] = useFilters();
+export default function OrdersPage() {
+  const { order: filters } = useFilters();
   const { data: clients } = useCollection<Client>({ path: 'clients', orderBy: [['name', 'asc']] });
   const [ordersLimit, setOrdersLimit] = useState(ORDERS_LIMIT);
-
   const queryConstraints: QueryConstraint[] = [
+    where('status', '==', filters.status),
     orderBy(filters.orderBy, filters.direction),
     limit(ordersLimit),
   ];
-  if (filters.status !== 'all') {
-    queryConstraints.push(where('status', '==', filters.status));
-  }
   if (filters.clients.length) {
     queryConstraints.push(where('clientId', 'in', filters.clients));
   }
   const { data: orders } = useCollection<Order>({ path: 'orders', queryConstraints });
-
+  const { data: pendingCount, mutate: updatePending } = useCollectionCount<Order>({
+    path: 'orders',
+    where: [['status', '==', 'pending']],
+  });
+  const { data: finishedCount, mutate: updateFinished } = useCollectionCount<Order>({
+    path: 'orders',
+    where: [['status', '==', 'finished']],
+  });
   const [orderFormOpened, orderFormHandler] = useDisclosure(false);
   const [clientListOpened, clientListHandler] = useDisclosure(false);
   const [formValues, setFormValues] = useState<Order>();
-
   const bodyRef = useRef<HTMLDivElement>();
   const { ref, entry } = useIntersection({ root: bodyRef.current, threshold: 0.5 });
 
@@ -45,10 +45,15 @@ export default function OrdersPage({ visibleNumbers }: OrdersPageProps) {
     setOrdersLimit(ORDERS_LIMIT);
   }, [filters.status]);
   useEffect(() => {
-    if (entry?.isIntersecting && !!orders) {
-      setOrdersLimit((prevState) => prevState + ORDERS_LIMIT);
-    }
+    if (entry?.isIntersecting && !!orders) setOrdersLimit((prevState) => prevState + ORDERS_LIMIT);
   }, [entry?.isIntersecting]);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      updatePending();
+      updateFinished();
+    }, 1000);
+    return () => clearTimeout(timeout);
+  }, [orders]);
 
   return (
     <MainLayout>
@@ -75,7 +80,13 @@ export default function OrdersPage({ visibleNumbers }: OrdersPageProps) {
             </Button>
           </>
         }
-        filters={<OrderFilters clients={clients} filters={filters} setFilters={setFilters} />}
+        filters={
+          <OrderFilters
+            clients={clients}
+            pendingCount={pendingCount}
+            finishedCount={finishedCount}
+          />
+        }
         withNumbersToggle
       />
       <MainLayout.Body ref={ref}>
@@ -103,16 +114,19 @@ export default function OrdersPage({ visibleNumbers }: OrdersPageProps) {
               <th style={{ width: 0 }} />
             </Table.Header>
             <Table.Body>
-              {orders?.map((order) => (
-                <OrderItem
-                  key={order.id}
-                  order={order}
-                  clientName={clients?.find((client) => client.id === order.clientId)?.name}
-                  visibleNumbers={visibleNumbers}
-                  setFormValues={setFormValues}
-                  openOrderForm={orderFormHandler.open}
-                />
-              ))}
+              <AnimatePresence mode="wait">
+                <Fragment key={filters.status}>
+                  {orders?.map((order) => (
+                    <OrderItem
+                      key={order.id}
+                      order={order}
+                      clientName={clients?.find((client) => client.id === order.clientId)?.name}
+                      setFormValues={setFormValues}
+                      openOrderForm={orderFormHandler.open}
+                    />
+                  ))}
+                </Fragment>
+              </AnimatePresence>
             </Table.Body>
           </Table>
           {orders?.length === ordersLimit && (

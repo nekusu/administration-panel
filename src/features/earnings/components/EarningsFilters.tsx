@@ -1,13 +1,12 @@
 import { Box, Checkbox, Collapse, createStyles, Group, MultiSelect, Stack } from '@mantine/core';
 import { DatePickerInput, DatesRangeValue, getWeekdayNames } from '@mantine/dates';
 import { LabeledSegmentedControl } from 'components';
+import { useFilters } from 'context/filters';
 import { Dispatch, SetStateAction } from 'react';
 import { RiCalendar2Line, RiCalendarEventLine } from 'react-icons/ri';
-import * as Filters from 'types/filters';
+import { Earnings } from 'types/filters';
 
 interface EarningsFiltersProps {
-  filters: Filters.Earnings;
-  updateFilter(value: Partial<Filters.Earnings>): void;
   dateRange: DatesRangeValue;
   setDateRange: Dispatch<SetStateAction<DatesRangeValue>>;
 }
@@ -22,12 +21,8 @@ const useStyles = createStyles((theme) => ({
 
 const TIMEFRAME_UNITS = ['Week', 'Month', 'Year', 'Custom'];
 
-export default function EarningsFilters({
-  filters,
-  updateFilter,
-  dateRange,
-  setDateRange,
-}: EarningsFiltersProps) {
+export default function EarningsFilters({ dateRange, setDateRange }: EarningsFiltersProps) {
+  const { earnings: filters, setFilters } = useFilters();
   const { classes } = useStyles();
 
   return (
@@ -37,7 +32,9 @@ export default function EarningsFilters({
           label="Timeframe"
           data={TIMEFRAME_UNITS.map((unit) => ({ label: unit, value: unit.toLowerCase() }))}
           value={filters.timeframe}
-          onChange={(value: Filters.Earnings['timeframe']) => updateFilter({ timeframe: value })}
+          onChange={(value: Earnings['timeframe']) =>
+            setFilters((draft) => void (draft.earnings.timeframe = value))
+          }
         />
         <Collapse in={filters.timeframe === 'custom'}>
           <DatePickerInput
@@ -65,18 +62,22 @@ export default function EarningsFilters({
           icon={<RiCalendarEventLine />}
           placeholder="Select days"
           value={filters.excludedDays}
-          onChange={(value) => updateFilter({ excludedDays: value })}
+          onChange={(value) => setFilters((draft) => void (draft.earnings.excludedDays = value))}
         />
         <Group>
           <Checkbox
             checked={filters.enableLeftTicks}
             label="Enable left ticks"
-            onChange={({ target: { checked } }) => updateFilter({ enableLeftTicks: checked })}
+            onChange={({ target: { checked } }) =>
+              setFilters((draft) => void (draft.earnings.enableLeftTicks = checked))
+            }
           />
           <Checkbox
             checked={filters.enableBottomTicks}
             label="Enable bottom ticks"
-            onChange={({ target: { checked } }) => updateFilter({ enableBottomTicks: checked })}
+            onChange={({ target: { checked } }) =>
+              setFilters((draft) => void (draft.earnings.enableBottomTicks = checked))
+            }
           />
         </Group>
       </Stack>

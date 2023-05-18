@@ -3,6 +3,7 @@ import { useForm, zodResolver } from '@mantine/form';
 import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
 import { openConfirmModal } from '@mantine/modals';
 import { QuantityInput, Table } from 'components';
+import { useGlobal } from 'context/global';
 import { deleteStockItem, editStockItem } from 'lib/firebase/utils';
 import { useEffect, useState } from 'react';
 import { RiCheckLine, RiDeleteBin7Line } from 'react-icons/ri';
@@ -13,7 +14,6 @@ import { MultiFormatColorInput } from './';
 
 interface StockItemProps {
   item: Stock.Item;
-  activeGroup?: Stock.Group;
 }
 
 interface FormValues {
@@ -28,7 +28,8 @@ const schema = z.object({
     }),
 });
 
-export default function Item({ item, activeGroup }: StockItemProps) {
+export default function Item({ item }: StockItemProps) {
+  const { activeGroup } = useGlobal();
   const theme = useMantineTheme();
   const form = useForm<FormValues>({
     initialValues: { color: '' },

@@ -1,5 +1,6 @@
 import { Group, MultiSelect, Text } from '@mantine/core';
 import { LabeledSegmentedControl, SelectItem, SelectValue } from 'components';
+import { useFilters } from 'context/filters';
 import {
   RiArrowDownLine,
   RiArrowUpLine,
@@ -8,15 +9,15 @@ import {
   RiPriceTag3Line,
 } from 'react-icons/ri';
 import { Tag } from 'types/expense';
-import * as Filters from 'types/filters';
+import { Expense } from 'types/filters';
 
 interface ExpenseFiltersProps {
   tags?: Tag[];
-  filters: Filters.Expense;
-  updateFilter(value: Partial<Filters.Expense>): void;
 }
 
-export default function ExpenseFilters({ tags, filters, updateFilter }: ExpenseFiltersProps) {
+export default function ExpenseFilters({ tags }: ExpenseFiltersProps) {
+  const { expense: filters, setFilters } = useFilters();
+
   return (
     <>
       <LabeledSegmentedControl
@@ -42,7 +43,9 @@ export default function ExpenseFilters({ tags, filters, updateFilter }: ExpenseF
           },
         ]}
         value={filters.orderBy}
-        onChange={(value: Filters.Expense['orderBy']) => updateFilter({ orderBy: value })}
+        onChange={(value: Expense['orderBy']) =>
+          setFilters((draft) => void (draft.expense.orderBy = value))
+        }
       />
       <LabeledSegmentedControl
         label="Direction"
@@ -67,7 +70,9 @@ export default function ExpenseFilters({ tags, filters, updateFilter }: ExpenseF
           },
         ]}
         value={filters.direction}
-        onChange={(value: Filters.Expense['direction']) => updateFilter({ direction: value })}
+        onChange={(value: Expense['direction']) =>
+          setFilters((draft) => void (draft.expense.direction = value))
+        }
       />
       <MultiSelect
         label="Filter by tags"
@@ -80,7 +85,7 @@ export default function ExpenseFilters({ tags, filters, updateFilter }: ExpenseF
         maxLength={18}
         searchable
         value={filters.tags}
-        onChange={(value) => updateFilter({ tags: value })}
+        onChange={(value) => setFilters((draft) => void (draft.expense.tags = value))}
       />
     </>
   );

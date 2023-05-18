@@ -1,5 +1,5 @@
 import { createStyles, Table as MantineTable, TableProps } from '@mantine/core';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, HTMLMotionProps, motion } from 'framer-motion';
 import { ReactNode } from 'react';
 
 const useStyles = createStyles((theme) => ({
@@ -43,11 +43,10 @@ function Body({ children }: { children: ReactNode }) {
   );
 }
 
-function Row({ children, layoutId, ...props }: { children: ReactNode; layoutId: string }) {
+function Row({ children, style, ...props }: HTMLMotionProps<'tr'>) {
   return (
     <motion.tr
-      style={{ cursor: 'default' }}
-      layoutId={layoutId}
+      style={{ cursor: 'default', ...style }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

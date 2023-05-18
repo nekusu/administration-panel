@@ -1,6 +1,7 @@
 import { Drawer, Navbar, Popover, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { SidebarButton, ThemePopover } from 'components';
+import { useGlobal } from 'context/global';
 import useBreakpoints from 'lib/mantine/useBreakpoints';
 import useWindowSize from 'lib/mantine/useWindowSize';
 import { IconType } from 'react-icons/lib';
@@ -11,13 +12,12 @@ interface SidebarProps {
     icon: IconType;
     label: string;
   }[];
-  pageIndex: number;
-  setPageIndex(value: number): void;
   opened: boolean;
   onClose(): void;
 }
 
-export default function Sidebar({ links, pageIndex, setPageIndex, opened, onClose }: SidebarProps) {
+export default function Sidebar({ links, opened, onClose }: SidebarProps) {
+  const { pageIndex, setGlobal } = useGlobal();
   const isSmallScreen = useBreakpoints({ smallerThan: 'sm' });
   const { height } = useWindowSize();
   const [themePopoverOpened, themePopoverHandler] = useDisclosure(false);
@@ -38,7 +38,10 @@ export default function Sidebar({ links, pageIndex, setPageIndex, opened, onClos
               key={link.label}
               small={isSmallScreen}
               active={index === pageIndex}
-              onClick={() => setPageIndex(index)}
+              onClick={() => {
+                setGlobal((draft) => void (draft.pageIndex = index));
+                if (isSmallScreen) onClose();
+              }}
             />
           ))}
         </Stack>
@@ -73,7 +76,13 @@ export default function Sidebar({ links, pageIndex, setPageIndex, opened, onClos
 
   if (isSmallScreen) {
     content = (
-      <Drawer size="auto" withCloseButton={false} opened={opened} onClose={onClose}>
+      <Drawer
+        size="auto"
+        withCloseButton={false}
+        opened={opened}
+        onClose={onClose}
+        styles={{ body: { padding: 0 } }}
+      >
         {content}
       </Drawer>
     );

@@ -2,7 +2,6 @@ import {
   ActionIconProps,
   ColorScheme,
   ColorSchemeProvider,
-  DefaultMantineColor,
   DrawerProps,
   LoaderProps,
   MantineProvider,
@@ -14,8 +13,8 @@ import {
   SelectProps,
   TextInputProps,
 } from '@mantine/core';
-import { useLocalStorage } from '@mantine/hooks';
 import { ModalsProvider } from '@mantine/modals';
+import { useGlobal } from 'context/global';
 import { ReactNode } from 'react';
 
 interface MantineProvidersProps {
@@ -85,19 +84,12 @@ const theme: MantineThemeOverride = {
 };
 
 export default function MantineProviders({ children }: MantineProvidersProps) {
-  const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
-    key: 'color-scheme',
-    defaultValue: 'dark',
-    getInitialValueInEffect: false,
-  });
-  const [primaryColor] = useLocalStorage<DefaultMantineColor>({
-    key: 'primary-color',
-    defaultValue: 'teal',
-    getInitialValueInEffect: false,
-  });
+  const { colorScheme, primaryColor, setGlobal } = useGlobal();
 
   const toggleColorScheme = (value?: ColorScheme) =>
-    setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
+    setGlobal(
+      (draft) => void (draft.colorScheme = value || (colorScheme === 'dark' ? 'light' : 'dark'))
+    );
 
   return (
     <MantineProvider

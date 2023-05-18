@@ -1,5 +1,6 @@
-import { Group, MultiSelect, Text } from '@mantine/core';
+import { Badge, Group, Loader, MultiSelect, Text } from '@mantine/core';
 import { LabeledSegmentedControl } from 'components';
+import { useFilters } from 'context/filters';
 import {
   RiArrowDownLine,
   RiArrowUpLine,
@@ -9,27 +10,46 @@ import {
   RiUserSearchLine,
 } from 'react-icons/ri';
 import { Client } from 'types/client';
-import * as Filters from 'types/filters';
+import { Order } from 'types/filters';
 
 interface OrderFiltersProps {
   clients?: Client[];
-  filters: Filters.Order;
-  setFilters(value: Partial<Filters.Order>): void;
+  pendingCount?: number;
+  finishedCount?: number;
 }
 
-export default function OrderFilters({ clients, filters, setFilters }: OrderFiltersProps) {
+export default function OrderFilters({ clients, pendingCount, finishedCount }: OrderFiltersProps) {
+  const { order: filters, setFilters } = useFilters();
+
   return (
     <>
       <LabeledSegmentedControl
         label="Status"
         data={[
-          { label: 'All', value: 'all' },
-          { label: 'Pending', value: 'pending' },
-          { label: 'Finished', value: 'finished' },
+          {
+            label: (
+              <Group spacing={8} position="center" noWrap>
+                Pending
+                {pendingCount ? <Badge p={6}>{pendingCount}</Badge> : <Loader size={16} />}
+              </Group>
+            ),
+            value: 'pending',
+          },
+          {
+            label: (
+              <Group spacing={8} position="center" noWrap>
+                Finished
+                {finishedCount ? <Badge p={6}>{finishedCount}</Badge> : <Loader size={16} />}
+              </Group>
+            ),
+            value: 'finished',
+          },
           { label: 'Delivered', value: 'delivered' },
         ]}
         value={filters.status}
-        onChange={(value: Filters.Order['status']) => setFilters({ status: value })}
+        onChange={(value: Order['status']) =>
+          setFilters((draft) => void (draft.order.status = value))
+        }
       />
       <LabeledSegmentedControl
         label="Order by"
@@ -63,7 +83,9 @@ export default function OrderFilters({ clients, filters, setFilters }: OrderFilt
           },
         ]}
         value={filters.orderBy}
-        onChange={(value: Filters.Order['orderBy']) => setFilters({ orderBy: value })}
+        onChange={(value: Order['orderBy']) =>
+          setFilters((draft) => void (draft.order.orderBy = value))
+        }
       />
       <LabeledSegmentedControl
         label="Direction"
@@ -88,7 +110,9 @@ export default function OrderFilters({ clients, filters, setFilters }: OrderFilt
           },
         ]}
         value={filters.direction}
-        onChange={(value: Filters.Order['direction']) => setFilters({ direction: value })}
+        onChange={(value: Order['direction']) =>
+          setFilters((draft) => void (draft.order.direction = value))
+        }
       />
       <MultiSelect
         label="Filter by clients"
@@ -99,7 +123,7 @@ export default function OrderFilters({ clients, filters, setFilters }: OrderFilt
         maxLength={36}
         searchable
         value={filters.clients}
-        onChange={(value) => setFilters({ clients: value })}
+        onChange={(value) => setFilters((draft) => void (draft.order.clients = value))}
       />
     </>
   );

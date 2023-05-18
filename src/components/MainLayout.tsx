@@ -3,24 +3,25 @@ import {
   Box,
   Button,
   Collapse,
-  createStyles,
   Group,
+  Loader,
   Header as MantineHeader,
   HeaderProps as MantineHeaderProps,
-  Loader,
   Stack,
   Sx,
   Title,
   Tooltip,
   Transition,
+  createStyles,
   useMantineTheme,
 } from '@mantine/core';
-import { useDebouncedValue, useLocalStorage, useMergedRef } from '@mantine/hooks';
+import { useDebouncedValue, useMergedRef } from '@mantine/hooks';
+import { useGlobal } from 'context/global';
 import { AnimatePresence, motion } from 'framer-motion';
 import useScroll from 'hooks/useScroll';
 import useBreakpoints from 'lib/mantine/useBreakpoints';
 import useWindowSize from 'lib/mantine/useWindowSize';
-import { forwardRef, ReactNode } from 'react';
+import { ReactNode, forwardRef } from 'react';
 import {
   RiArrowUpLine,
   RiEyeLine,
@@ -76,26 +77,14 @@ function Header({
 }: HeaderProps) {
   const { classes } = useStyles();
   const isSmallScreen = useBreakpoints({ smallerThan: 'sm' });
-  const [visibleFilters, setVisibleFilters] = useLocalStorage({
-    key: 'visible-filters',
-    defaultValue: true,
-    getInitialValueInEffect: false,
-  });
-  const [visibleNumbers, setVisibleNumbers] = useLocalStorage({
-    key: 'visible-numbers',
-    defaultValue: true,
-    getInitialValueInEffect: false,
-  });
-  const [visibleSidePanel, setVisibleSidePanel] = useLocalStorage({
-    key: 'visible-side-panel',
-    defaultValue: true,
-    getInitialValueInEffect: false,
-  });
+  const { visibleFilters, visibleNumbers, visibleSidePanel, setGlobal } = useGlobal();
   const [debouncedLoading] = useDebouncedValue(loading, 100);
-
-  const toggleVisibleFilters = () => setVisibleFilters((prevState) => !prevState);
-  const toggleVisibleNumbers = () => setVisibleNumbers((prevState) => !prevState);
-  const toggleVisibleSidePanel = () => setVisibleSidePanel((prevState) => !prevState);
+  const toggleVisibleFilters = () =>
+    setGlobal((draft) => void (draft.visibleFilters = !visibleFilters));
+  const toggleVisibleNumbers = () =>
+    setGlobal((draft) => void (draft.visibleNumbers = !visibleNumbers));
+  const toggleVisibleSidePanel = () =>
+    setGlobal((draft) => void (draft.visibleSidePanel = !visibleSidePanel));
 
   return (
     <MantineHeader height="fit-content" p="lg" {...props} styles={{ root: { zIndex: 2 } }}>

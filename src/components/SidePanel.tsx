@@ -1,5 +1,6 @@
 import { createStyles, Drawer, Paper, Title } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
+import { useGlobal } from 'context/global';
 import { motion } from 'framer-motion';
 import useBreakpoints from 'lib/mantine/useBreakpoints';
 import useWindowSize from 'lib/mantine/useWindowSize';
@@ -8,8 +9,6 @@ import { DragSizing } from 'react-drag-sizing';
 
 export interface SidePanelProps {
   children: ReactNode;
-  opened: boolean;
-  onClose(): void;
   title?: string;
   minWidth?: string | number;
   maxWidth?: string | number;
@@ -45,13 +44,12 @@ const useStyles = createStyles((theme) => ({
 
 export default function SidePanel({
   children,
-  opened,
-  onClose,
   title,
   minWidth = 400,
   maxWidth = 'min(900px, 45vw)',
   style,
 }: SidePanelProps) {
+  const { visibleSidePanel, setGlobal } = useGlobal();
   const { classes, cx } = useStyles();
   const isLargeScreen = useBreakpoints({ largerThan: 'lg' });
   const { height } = useWindowSize();
@@ -61,7 +59,7 @@ export default function SidePanel({
     getInitialValueInEffect: false,
   });
   const sidePanelRef = useRef<HTMLDivElement>(null);
-  const isVisible = !!title && opened;
+  const isVisible = !!title && visibleSidePanel;
 
   return (
     <>
@@ -102,10 +100,10 @@ export default function SidePanel({
           title={title}
           padding="lg"
           size="min(650px, 100vw)"
-          opened={opened}
-          onClose={onClose}
+          opened={visibleSidePanel}
+          onClose={() => setGlobal((draft) => (draft.visibleSidePanel = false))}
           styles={{
-            content: { overflowY: 'auto' },
+            header: { zIndex: 'unset' },
             title: { fontSize: '2.125rem', fontWeight: 700 },
           }}
         >

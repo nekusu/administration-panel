@@ -13,6 +13,7 @@ import { useForm, zodResolver } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { openConfirmModal } from '@mantine/modals';
 import { Table } from 'components';
+import { useGlobal } from 'context/global';
 import dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -33,7 +34,6 @@ import { z } from 'zod';
 interface OrderItemProps {
   order: Order;
   clientName?: string;
-  visibleNumbers: boolean;
   setFormValues: Dispatch<SetStateAction<Order | undefined>>;
   openOrderForm: () => void;
 }
@@ -58,10 +58,10 @@ const schema = z.object({
 export default function OrderItem({
   order,
   clientName,
-  visibleNumbers,
   setFormValues,
   openOrderForm,
 }: OrderItemProps) {
+  const { visibleNumbers } = useGlobal();
   const theme = useMantineTheme();
   const isSmallScreen = useBreakpoints({ smallerThan: 'sm' });
   const form = useForm<FormValues>({

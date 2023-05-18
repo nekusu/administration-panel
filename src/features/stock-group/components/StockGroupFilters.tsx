@@ -16,11 +16,11 @@ import {
 import { useForm, zodResolver } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { Load } from 'components';
+import { useFilters } from 'context/filters';
 import { AnimatePresence, motion } from 'framer-motion';
 import { addStockMarker } from 'lib/firebase/utils';
 import { useEffect } from 'react';
 import { RiAddLine, RiBarChart2Line, RiPriceTag3Line } from 'react-icons/ri';
-import * as Filters from 'types/filters';
 import * as Stock from 'types/stock';
 import { z } from 'zod';
 import { StockMarker } from './';
@@ -28,8 +28,6 @@ import { StockMarker } from './';
 interface StockGroupFiltersProps {
   markers?: Stock.Marker[];
   activeGroup?: Stock.Group;
-  filters: Filters.StockGroup;
-  updateFilter(value: Partial<Filters.StockGroup>): void;
 }
 
 interface FormValues {
@@ -47,12 +45,8 @@ const schema = z.object({
   value: z.number({ invalid_type_error: 'Required' }).min(MIN_VALUE).max(MAX_VALUE),
 });
 
-export default function StockGroupFilters({
-  markers,
-  activeGroup,
-  filters,
-  updateFilter,
-}: StockGroupFiltersProps) {
+export default function StockGroupFilters({ markers, activeGroup }: StockGroupFiltersProps) {
+  const { stockGroup: filters, setFilters } = useFilters();
   const theme = useMantineTheme();
   const form = useForm<FormValues>({
     initialValues: { color: 0, name: '' },
@@ -159,7 +153,9 @@ export default function StockGroupFilters({
           {markers?.length ? (
             <Chip.Group
               value={filters.enabledMarkers}
-              onChange={(value) => updateFilter({ enabledMarkers: value })}
+              onChange={(value) =>
+                setFilters((draft) => void (draft.stockGroup.enabledMarkers = value))
+              }
               multiple
             >
               <Group spacing="xs">
@@ -179,12 +175,16 @@ export default function StockGroupFilters({
         <Checkbox
           checked={filters.enableLeftTicks}
           label="Enable left ticks"
-          onChange={({ target: { checked } }) => updateFilter({ enableLeftTicks: checked })}
+          onChange={({ target: { checked } }) =>
+            setFilters((draft) => void (draft.stockGroup.enableLeftTicks = checked))
+          }
         />
         <Checkbox
           checked={filters.enableLabels}
           label="Enable labels"
-          onChange={({ target: { checked } }) => updateFilter({ enableLabels: checked })}
+          onChange={({ target: { checked } }) =>
+            setFilters((draft) => void (draft.stockGroup.enableLabels = checked))
+          }
         />
       </Group>
     </Stack>

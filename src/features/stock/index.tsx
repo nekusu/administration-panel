@@ -1,19 +1,16 @@
 import { Button, Collapse, createStyles, Tabs } from '@mantine/core';
-import { useDebouncedState, useDisclosure, useLocalStorage } from '@mantine/hooks';
+import { useDebouncedState, useDisclosure } from '@mantine/hooks';
 import { useCollection } from '@tatsuokaniwa/swr-firestore';
 import { ListManager, Load, MainLayout, Table } from 'components';
+import { useFilters } from 'context/filters';
+import { useGlobal } from 'context/global';
 import { getDoc } from 'firebase/firestore';
+import { AnimatePresence } from 'framer-motion';
 import { addStockGroup } from 'lib/firebase/utils';
-import { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
+import { Fragment, useEffect, useMemo } from 'react';
 import { RiAddLine, RiFolderSettingsLine } from 'react-icons/ri';
-import * as Filters from 'types/filters';
 import * as Stock from 'types/stock';
 import { StockFilters, StockForm, StockItem } from './components';
-
-interface StockPageProps {
-  activeGroup?: Stock.Group;
-  setActiveGroup: Dispatch<SetStateAction<Stock.Group | undefined>>;
-}
 
 const useStyles = createStyles((theme) => ({
   tab: {
@@ -27,25 +24,14 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function StockPage({ activeGroup, setActiveGroup }: StockPageProps) {
+export default function StockPage() {
+  const { activeGroup, setGlobal } = useGlobal();
+  const { stock: filters } = useFilters();
   const { classes } = useStyles();
   const { data: groups } = useCollection<Stock.Group>({
     path: 'groups',
     orderBy: [['name', 'asc']],
   });
-
-  const [filters, setFilters] = useLocalStorage<Filters.Stock>({
-    key: 'stock-filters',
-    defaultValue: {
-      orderBy: 'code',
-      direction: 'asc',
-    },
-    getInitialValueInEffect: false,
-  });
-  const updateFilter = (value: Partial<Filters.Stock>) => {
-    setFilters((prevState) => ({ ...prevState, ...value }));
-  };
-
   const { data: items } = useCollection<Stock.Item>(
     activeGroup
       ? { path: `groups/${activeGroup.id}/items`, orderBy: [[filters.orderBy, filters.direction]] }
@@ -56,18 +42,15 @@ export default function StockPage({ activeGroup, setActiveGroup }: StockPageProp
     () => items?.filter((item) => item.code.match(new RegExp(searchValue, 'gi'))),
     [items, searchValue]
   );
-
   const [stockFormOpened, stockFormHandler] = useDisclosure(false);
   const [groupListOpened, groupListHandler] = useDisclosure(false);
 
   useEffect(() => {
     const currentGroup = groups?.find(({ id }) => activeGroup?.id === id);
-    if (currentGroup && currentGroup.name !== activeGroup?.name) {
-      setActiveGroup(currentGroup);
-    }
-    if (!(groups?.some(({ id }) => activeGroup?.id === id) || !groups)) {
-      setActiveGroup(groups?.[0]);
-    }
+    if (currentGroup && currentGroup.name !== activeGroup?.name)
+      setGlobal((draft) => void (draft.activeGroup = currentGroup));
+    if (!(groups?.some(({ id }) => activeGroup?.id === id) || !groups))
+      setGlobal((draft) => void (draft.activeGroup = groups?.[0]));
   }, [groups]);
 
   return (
@@ -89,13 +72,7 @@ export default function StockPage({ activeGroup, setActiveGroup }: StockPageProp
             </Button>
           </>
         }
-        filters={
-          <StockFilters
-            setSearchValue={setSearchValue}
-            filters={filters}
-            updateFilter={updateFilter}
-          />
-        }
+        filters={<StockFilters setSearchValue={setSearchValue} />}
         pb={groups?.length ? 0 : 'lg'}
         withBorder={!groups?.length}
       >
@@ -104,7 +81,11 @@ export default function StockPage({ activeGroup, setActiveGroup }: StockPageProp
             mx="-lg"
             pt="lg"
             value={activeGroup?.id}
-            onTabChange={(value) => setActiveGroup(groups?.find(({ id }) => value === id))}
+            onTabChange={(value) =>
+              setGlobal(
+                (draft) => void (draft.activeGroup = groups?.find(({ id }) => value === id))
+              )
+            }
           >
             <Tabs.List>
               {groups?.map(({ id, name }, index) => (
@@ -123,13 +104,7 @@ export default function StockPage({ activeGroup, setActiveGroup }: StockPageProp
         </Collapse>
       </MainLayout.Header>
       <MainLayout.Body>
-        <StockForm
-          opened={stockFormOpened}
-          closeForm={stockFormHandler.close}
-          groups={groups}
-          activeGroup={activeGroup}
-          setActiveGroup={setActiveGroup}
-        />
+        <StockForm opened={stockFormOpened} closeForm={stockFormHandler.close} groups={groups} />
         <ListManager
           opened={groupListOpened}
           close={groupListHandler.close}
@@ -138,7 +113,7 @@ export default function StockPage({ activeGroup, setActiveGroup }: StockPageProp
           addItem={async (item) => {
             const newGroupRef = await addStockGroup(item);
             const newGroup = await getDoc(newGroupRef);
-            setActiveGroup({ id: newGroup.id, name: item.name });
+            setGlobal((draft) => void (draft.activeGroup = { id: newGroup.id, name: item.name }));
           }}
         />
         <Load in={!!filteredItems}>
@@ -150,9 +125,13 @@ export default function StockPage({ activeGroup, setActiveGroup }: StockPageProp
               <th style={{ width: 0 }} />
             </Table.Header>
             <Table.Body>
-              {filteredItems?.map((item) => (
-                <StockItem key={item.id} item={item} activeGroup={activeGroup} />
-              ))}
+              <AnimatePresence mode="wait">
+                <Fragment key={activeGroup?.id}>
+                  {filteredItems?.map((item) => (
+                    <StockItem key={item.id} item={item} />
+                  ))}
+                </Fragment>
+              </AnimatePresence>
             </Table.Body>
           </Table>
         </Load>

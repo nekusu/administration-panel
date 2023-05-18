@@ -1,6 +1,6 @@
+import { Button, createStyles, Tooltip } from '@mantine/core';
 import { forwardRef } from 'react';
 import { IconType } from 'react-icons';
-import { Button, createStyles, Tooltip } from '@mantine/core';
 
 interface SidebarButtonProps {
   icon: IconType;
@@ -19,7 +19,7 @@ const useStyles = createStyles((theme) => ({
     justifyContent: 'center',
     color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.colors.gray[7],
 
-    [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
+    [`@media (max-width: ${theme.breakpoints.sm})`]: {
       width: 'auto',
       height: 'auto',
       justifyContent: 'flex-start',
@@ -39,7 +39,7 @@ const useStyles = createStyles((theme) => ({
 
 const SidebarButton = forwardRef<HTMLButtonElement, SidebarButtonProps>(function SidebarButton(
   { icon: Icon, label, small, active, onClick },
-  ref,
+  ref
 ) {
   const { classes, cx } = useStyles();
 
