@@ -55,7 +55,7 @@ export default function EarningsFilters({ dateRange, setDateRange }: EarningsFil
           label="Exclude"
           data={getWeekdayNames({ locale: 'en', format: 'dddd', firstDayOfWeek: 0 }).map(
             (day, index) => ({
-              label: day,
+              label: day as string,
               value: index.toString(),
             })
           )}
