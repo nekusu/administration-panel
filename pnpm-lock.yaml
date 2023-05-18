@@ -40,6 +40,9 @@ dependencies:
   framer-motion:
     specifier: ^10.12.4
     version: 10.12.4(react-dom@18.2.0)(react@18.2.0)
+  immer:
+    specifier: ^10.0.1
+    version: 10.0.1
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -58,6 +61,9 @@ dependencies:
   tinycolor2:
     specifier: ^1.6.0
     version: 1.6.0
+  use-immer:
+    specifier: ^0.9.0
+    version: 0.9.0(immer@10.0.1)(react@18.2.0)
   use-long-press:
     specifier: ^3.0.4
     version: 3.0.4(react@18.2.0)
@@ -3072,6 +3078,10 @@ packages:
     engines: {node: '>= 4'}
     dev: true
 
+  /immer@10.0.1:
+    resolution: {integrity: sha512-zg++jJLsKKTwXGeSYIw0HgChSYQGtu0UDTnbKx5aGLYgte4CwTmH9eJDYyQ6FheyUtBe+lQW9FrGxya1G+Dtmg==}
+    dev: false
+
   /import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
     engines: {node: '>=6'}
@@ -4246,6 +4256,16 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
+      react: 18.2.0
+    dev: false
+
+  /use-immer@0.9.0(immer@10.0.1)(react@18.2.0):
+    resolution: {integrity: sha512-/L+enLi0nvuZ6j4WlyK0US9/ECUtV5v9RUbtxnn5+WbtaXYUaOBoKHDNL9I5AETdurQ4rIFIj/s+Z5X80ATyKw==}
+    peerDependencies:
+      immer: '>=2.0.0'
+      react: ^16.8.0 || ^17.0.1 || ^18.0.0
+    dependencies:
+      immer: 10.0.1
       react: 18.2.0
     dev: false
 
